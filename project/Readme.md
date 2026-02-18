@@ -1,4 +1,4 @@
-# 🔍 Text-Based Drug Trafficking Detection System
+# 🔍 Algospeak-Resilient Semantic Detection of Illicit Drug Content Using TF-IDF and Real-Time Browser Extension Architecture
 
 An NLP-based machine learning system that analyzes text messages and classifies them as **Drug Trafficking (Illicit)** or **Safe (Normal)** using Natural Language Processing and Naive Bayes classification. Includes **emoji-coded message detection** — identifying drug emojis like 🍃💊❄️🍄💉 used as code on social media.
 
