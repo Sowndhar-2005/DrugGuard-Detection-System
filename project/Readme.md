@@ -8,7 +8,7 @@ An NLP-based machine learning system that analyzes text messages and classifies 
 
 This project detects potential drug trafficking activity from plain text — such as social media posts, chat messages, or online listings. It uses a **Multinomial Naive Bayes** classifier trained on text data to identify suspicious language patterns commonly associated with illegal drug trade.
 
-> **🆕 Emoji Detection:** The model now recognizes emoji-coded drug messages — a common real-world tactic where dealers use emojis like 🍃 (marijuana), 💊 (pills), ❄️ (cocaine), 🍄 (mushrooms), and 🔌 (dealer/plug) to evade text-based filters.
+> **🆕 Emoji Detection:** The model now recognizes emoji-coded drug messages — a common real-world tactic where dealers use emojis like 🍃 (marijuana), ❄️ (cocaine),💊 (pills), 🍄 (mushrooms), and 🔌 (dealer/plug) to evade text-based filters.
 
 ### How It Works
 
