@@ -232,26 +232,7 @@
       const banner = document.createElement("div");
       banner.className = "drugguard-block-banner";
       banner.textContent = "⚠️ Drug-related content detected — Click to reveal";
-      banner.addEventListener("click", (e) => {
-        e.stopPropagation();
-        element.classList.remove("drugguard-block");
-        element.classList.add("drugguard-revealed");
-        banner.remove();
-      });
-
       element.parentElement.appendChild(banner);
-
-      // Also allow clicking the blurred element itself
-      element.addEventListener(
-        "click",
-        (e) => {
-          e.stopPropagation();
-          element.classList.remove("drugguard-block");
-          element.classList.add("drugguard-revealed");
-          banner.remove();
-        },
-        { once: true }
-      );
 
       addFlaggedItem(text, risk_score, "block", triggered_words);
     }
@@ -447,22 +428,7 @@
       const banner = document.createElement("div");
       banner.className = "drugguard-block-banner";
       banner.textContent = "⚠️ Drug-related image detected — Click to reveal";
-      
-      banner.addEventListener("click", (e) => {
-        e.stopPropagation();
-        img.classList.remove("drugguard-block");
-        img.classList.add("drugguard-revealed");
-        banner.remove();
-      });
-
       img.parentElement.appendChild(banner);
-
-      img.addEventListener("click", (e) => {
-        e.stopPropagation();
-        img.classList.remove("drugguard-block");
-        img.classList.add("drugguard-revealed");
-        banner.remove();
-      }, { once: true });
 
       addFlaggedItem("[IMAGE] Flagged words: " + (triggered_words.join(", ") || "illicit text"), risk_score, "block", triggered_words);
     }
@@ -553,6 +519,39 @@
         sendResponse({ ok: true });
       }
     });
+
+    // Global delegated click listener to ensure click-to-reveal always works
+    // Uses capture phase (true) to intercept clicks before other event handlers block them
+    document.addEventListener("click", (e) => {
+      if (!extensionEnabled) return;
+
+      const banner = e.target.closest(".drugguard-block-banner");
+      const blockEl = e.target.closest(".drugguard-block");
+
+      if (banner) {
+        e.stopPropagation();
+        e.preventDefault();
+        const parent = banner.parentElement;
+        if (parent) {
+          const blurred = parent.querySelector(".drugguard-block");
+          if (blurred) {
+            blurred.classList.remove("drugguard-block");
+            blurred.classList.add("drugguard-revealed");
+          }
+        }
+        banner.remove();
+      } else if (blockEl) {
+        e.stopPropagation();
+        e.preventDefault();
+        blockEl.classList.remove("drugguard-block");
+        blockEl.classList.add("drugguard-revealed");
+        const parent = blockEl.parentElement;
+        if (parent) {
+          const bannerEl = parent.querySelector(".drugguard-block-banner");
+          if (bannerEl) bannerEl.remove();
+        }
+      }
+    }, true);
   }
 
   init();
