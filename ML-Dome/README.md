@@ -1,115 +1,66 @@
-# 🔍 Algospeak-Resilient Semantic Detection of Illicit Drug Content Using TF-IDF and Real-Time Browser Extension Architecture
+# 🔍 DrugGuard: Naive Bayes NLP Model & FastAPI Server
 
-An NLP-based machine learning system that analyzes text messages and classifies them as **Drug Trafficking (Illicit)** or **Safe (Normal)** using Natural Language Processing and Naive Bayes classification. Includes **emoji-coded message detection** — identifying drug emojis like 🍃💊❄️🍄💉 used as code on social media.
-
-This repository also features a **Pill Dataset Visualization & Live OCR Scanning Dashboard** to browse and test model classification on real pill image datasets.
+This directory contains the machine learning backend and API server for the DrugGuard extension. It handles real-time text classification and image OCR scanning.
 
 ---
 
-## 📌 About the Project
+## 📁 Directory Structure
 
-This project detects potential drug trafficking activity from plain text — such as social media posts, chat messages, or online listings. It uses a **Multinomial Naive Bayes** classifier trained on text data to identify suspicious language patterns commonly associated with illegal drug trade.
-
-* **Algospeak / Emoji Detection:** The model recognizes emoji-coded drug messages — a common real-world tactic where dealers use emojis like 🍃 (marijuana), ❄️ (cocaine), 💊 (pills), 🍄 (mushrooms), and 🔌 (dealer/plug) to evade filters.
-* **Multimodal Image OCR:** The backend exposes a `/predict_image` endpoint using `RapidOCR` to extract text from image advertisements and classify the extracted content.
-
----
-
-## 🖼️ Pill Dataset Explorer & OCR Inspector
-
-An interactive, high-fidelity visualizer dashboard is available to browse Legitimate Reference and Consumer-grade pill images of **Fluoxetine 10 MG (NDC 00781-2823-13)**.
-
-### Features
-1. **Reference Image Resolution Inspector**:
-   - Side-by-side comparison of **RxNav API** catalog images vs **NLM Base** reference images.
-   - Interactive slider to switch resolutions: `120px`, `300px`, `600px`, `800px`, `1024px`, and `Original`.
-   - Hover zoom effect to inspect capsule marking details.
-2. **Consumer Image Gallery**:
-   - Filter and search through 17 consumer-grade photos taken under various lighting and layouts.
-   - Elegant placeholders and handling for RAW camera files (`.CR2`) which browsers cannot render natively.
-3. **Live Model OCR Scanner**:
-   - Integrates directly with the FastAPI backend `/predict_image` endpoint.
-   - Converts standard images to base64, runs OCR extraction, and renders the model’s prediction label (`Safe` 🟢, `Warn` 🟡, `Block` 🔴), risk score, and triggered drug keywords dynamically.
+* `train_model.py` — Loads the dataset, trains a Multinomial Naive Bayes classifier, evaluates performance, and serializes the model and vectorizer.
+* `setup_dataset_v2.py` — Generates a robust synthetic training dataset (`dataset.csv`) of 1,200 samples with hard negatives (news, medical, e-commerce) and emoji-coded slang.
+* `server.py` — FastAPI server exposing `/predict` (for page text) and `/predict_image` (for base64 images via OCR) endpoints.
+* `app.py` — Simple CLI program to manually test text predictions.
+* `dataset.csv` — Labeled training data.
+* `text_model.pkl` & `vectorizer.pkl` — Trained Naive Bayes model and fitted count vectorizer (CountVectorizer).
 
 ---
 
-## 📁 Project Structure
+## ⚡ API Endpoints
 
-```
-Ml-Project/
-│
-├── ML-Dome/                  → Backend ML & Server code
-│   ├── app.py                → Interactive CLI app to test predictions
-│   ├── server.py             → FastAPI backend server (port 8000)
-│   ├── setup_dataset_v2.py   → Generates synthetic dataset with hard negatives
-│   ├── train_model.py        → Trains the Multinomial Naive Bayes classifier
-│   ├── dataset.csv           → Training data (1200 rows, text + emoji)
-│   ├── text_model.pkl        → Saved trained Naive Bayes model (.pkl)
-│   ├── vectorizer.pkl        → Saved CountVectorizer (.pkl)
-│   └── README.md             → Server and model documentation
-│
-├── sampleData/               → Pill images dataset (Fluoxetine 10mg)
-│   ├── consumer/             → 17 consumer-grade pill images
-│   ├── reference/            → Legitimate NLM and RxNav images at 6 resolutions
-│   └── metadata.json         → Consolidated JSON metadata of the dataset
-│
-├── test_page.html            → Chrome extension test web page
-├── data_visualizer.html      → Pill dataset explorer & live OCR scanner
-└── drug_image.png / safe_image.png → Generated test flyers for OCR
-```
+### 1. `GET /health`
+Quick health check to verify the server and model are running.
 
----
+### 2. `POST /predict`
+Used by the browser extension to scan raw text blocks in real time.
+* **Request Body**: `{ "text": "string" }`
+* **Response**:
+  ```json
+  {
+    "action": "block", // "safe" | "warn" | "block"
+    "risk_score": 0.941,
+    "confidence": 94.1,
+    "label": 1,
+    "triggered_words": ["powder", "pickup"]
+  }
+  ```
 
-## 🚀 How to Run
-
-### Step 1: Install Dependencies
-Make sure you have Python 3.8+ installed, then install the required packages:
-```bash
-pip install pandas scikit-learn fastapi uvicorn pillow openpyxl rapidocr-onnxruntime
-```
-
-### Step 2: Start the Backend Server
-Navigate to the `ML-Dome` directory and run the FastAPI server:
-```bash
-cd ML-Dome
-python server.py
-```
-* The server will start on `http://localhost:8000`.
-* Check health at `http://localhost:8000/health`.
-
-### Step 3: Launch the Visualizer Page
-With the backend server running, open your browser and navigate to:
-👉 **`http://localhost:8000/static/data_visualizer.html`**
-
-You can use the slider to inspect reference resolutions and click **"Run OCR Scan"** on any consumer image card to see the backend OCR model classify it in real-time.
+### 3. `POST /predict_image`
+Used to extract text from a base64 encoded image (such as advertisement flyers) using `RapidOCR` and classify it.
+* **Request Body**: `{ "image": "data:image/png;base64,..." }`
+* **Response**: Same as `/predict` response schema.
 
 ---
 
-## 📊 Model Performance
+## ⚙️ How to Setup and Train
 
-Trained using `MultinomialNB` on 1,200 rows containing balanced safe text, hard negatives (medical, news, marketplace contexts), and illicit trafficking messages:
+1. **Install Dependencies**:
+   ```bash
+   pip install pandas scikit-learn fastapi uvicorn pillow rapidocr-onnxruntime
+   ```
 
-| Metric | Score |
-| :--- | :--- |
-| **Accuracy** | **98.33%** |
-| **F1-Score** | **0.98** |
+2. **Generate the Dataset**:
+   ```bash
+   python setup_dataset_v2.py
+   ```
 
----
+3. **Train the Model**:
+   ```bash
+   python train_model.py
+   ```
 
-## 🔤 Emoji Code Reference
-
-Common emojis used as drug codes on social media:
-
-| Emoji | Drug Code Meaning |
-| :--- | :--- |
-| 🍃🌿 | Marijuana / Weed |
-| ❄️ | Cocaine |
-| 💊 | Pills / MDMA / Xanax |
-| 🍄 | Mushrooms / Psychedelics |
-| 💉 | Heroin / Injectables |
-| 🔌 | Plug / Dealer |
-| 📦 | Package / Shipment |
-| 💰💵 | Money / Payment |
-| 🔥 | High Quality |
-| ⚡ | Fast Delivery |
-| 🤫 | Secrecy / Discreet |
+4. **Run Backend API Server**:
+   ```bash
+   python server.py
+   ```
+   * The API server runs on `http://localhost:8000`.
+   * Check interactive documentation at `http://localhost:8000/docs`.

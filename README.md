@@ -1,6 +1,8 @@
 # 🛡️ DrugGuard: Algospeak-Resilient Semantic Detection of Illicit Drug Content
 
-Online social platforms and messaging apps are increasingly exploited for illicit drug trafficking. To evade automated moderators, traffickers use a sophisticated linguistic strategy known as **Algospeak**—using emoji codes (e.g., `🍃` for weed, `❄️` for cocaine, `🔌` for dealer), leetspeak, intentional typos, and spaced letters. Standard keyword filters are easily bypassed by these methods, creating a pressing need for a system that understands the context and semantics of social media communications in real time.
+![DrugGuard Extension Demo](extension_preview.png)
+
+Online social platforms and messaging apps are increasingly exploited for illicit drug trafficking. To evade automated moderators, traffickers use a sophisticated linguistic strategy known as **Algospeak**—using emoji codes (e.g., `🍃` for weed, `❄️` for cocaine, `💊` for pills, `🔌` for dealer), leetspeak, intentional typos, and spaced letters. Standard keyword filters are easily bypassed by these methods, creating a pressing need for a system that understands the context and semantics of social media communications in real time.
 
 **DrugGuard** solves this by providing a lightweight, high-performance, and algospeak-resilient browser extension powered by a machine learning backend. It dynamically scans webpage text, performs Optical Character Recognition (OCR) on image advertisements, and intervenes on the user interface (by blurring content or showing warning indicators) in milliseconds.
 
@@ -37,10 +39,6 @@ The system is structured as a real-time client-server architecture:
 * Integrated with `RapidOCR` on the `/predict_image` endpoint.
 * Extracts embedded text from image flyers, posts, and ads (even with stylized fonts) and runs predictions on the extracted text.
 
-### 4. Pill Dataset Explorer & Inspector
-* An interactive dashboard served at `http://localhost:8000/static/ML-Dome/data_visualizer.html`.
-* Includes a reference resolution comparison slider (120px to Original) and a filtered gallery of consumer pill photos (Fluoxetine NDC 00781-2823-13) integrated with live backend OCR scanning.
-
 ---
 
 ## ⚡ Performance & Timing Metrics
@@ -54,9 +52,9 @@ A primary engineering constraint was ensuring that web content scanning does not
 
 ---
 
-## 🧪 Visual Test Cases
+## 🧪 Visual Test Cases & Mockups
 
-You can verify the live OCR scanning functionality using the visualizer dashboard or by running the extension against the generated flyer test cases in the project root:
+You can verify the live OCR scanning functionality using the generated flyer test cases in the project root:
 
 | Test Image | Type | Description | Expected Model Action |
 | :---: | :--- | :--- | :--- |
@@ -71,12 +69,11 @@ You can verify the live OCR scanning functionality using the visualizer dashboar
 
 ```
 .
-├── ML-Dome/                  --> Backend ML, Server, and visualizer assets
+├── ML-Dome/                  --> Backend ML, Server, and model assets
 │   ├── app.py                --> Interactive CLI test app
 │   ├── server.py             --> FastAPI server (handles /predict and /predict_image)
 │   ├── train_model.py        --> Model training and evaluation script
 │   ├── setup_dataset_v2.py   --> Synthetic dataset generator with hard negatives
-│   ├── data_visualizer.html  --> Pill dataset explorer dashboard
 │   ├── dataset.csv           --> Labeled dataset of 1,200 entries
 │   ├── text_model.pkl        --> Saved trained Naive Bayes classifier
 │   └── vectorizer.pkl        --> Saved vocabulary vectorizer
@@ -88,13 +85,15 @@ You can verify the live OCR scanning functionality using the visualizer dashboar
 │       └── popup.html/js     --> UI popup controller
 │
 ├── drug_image.png / safe_image.png --> Pre-generated OCR test images
-├── test_page.html            --> Extension test sandbox page
+├── test_page.html            --> Extension test sandbox page (highly styled)
+├── drug_test.html            --> Simple forum board test sandbox page
+├── extension_preview.png     --> Extension preview banner image
 └── README.md                 --> Main project documentation
 ```
 
 ---
 
-## 🚀 Quick Start Guide
+## 🚀 How to Run Locally
 
 ### 1. Install Requirements
 Ensure you have Python 3.8+ installed:
@@ -118,5 +117,6 @@ python server.py
 4. Select the `project/extension` folder from this repository.
 
 ### 4. Test Live Detection
-* Open `http://localhost:8000/static/test_page.html` to see the extension scan, highlight, and blur blocks of text on the test page automatically.
-* Open `http://localhost:8000/static/ML-Dome/data_visualizer.html` to run local OCR scans on the pill images dataset.
+Open the local test pages in your browser to see the extension scan, highlight, and blur blocks of text on the test page automatically:
+* **Styled Extension Test Page**: 👉 `http://localhost:8000/static/test_page.html`
+* **Street Market Forum Sandbox**: 👉 `http://localhost:8000/static/drug_test.html`
