@@ -1,0 +1,1774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DrugGuard — Pill Dataset Visualizer & OCR Inspector</title>
+  <meta name="description" content="Interactive visualizer for the Fluoxetine pill image dataset, featuring resolution comparison and live OCR model scanning." />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap');
+
+    :root {
+      --bg-darker: #08080d;
+      --bg-dark: #0f0f1b;
+      --bg-card: #15152a;
+      --bg-card-hover: #1c1c3a;
+      --border-color: rgba(99, 102, 241, 0.15);
+      --border-hover: rgba(99, 102, 241, 0.35);
+      --accent-color: #6366f1;
+      --accent-glow: rgba(99, 102, 241, 0.5);
+      --text-main: #f1f1f6;
+      --text-muted: #94a3b8;
+      
+      --color-safe: #10b981;
+      --color-warn: #f59e0b;
+      --color-danger: #ef4444;
+      --color-safe-glow: rgba(16, 185, 129, 0.25);
+      --color-warn-glow: rgba(245, 158, 11, 0.25);
+      --color-danger-glow: rgba(239, 68, 68, 0.25);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-darker);
+      background-image: 
+        radial-gradient(at 10% 20%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
+        radial-gradient(at 90% 80%, rgba(139, 92, 246, 0.05) 0px, transparent 50%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding-bottom: 80px;
+      overflow-x: hidden;
+    }
+
+    /* Scrollbar Styling */
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-darker);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #252542;
+      border-radius: 5px;
+      border: 2px solid var(--bg-darker);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-color);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 20px 24px;
+    }
+
+    /* Header & Title Section */
+    header {
+      padding: 40px 0 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      position: relative;
+    }
+
+    .badge-pill-main {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid var(--border-color);
+      color: #a5b4fc;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      background: #a5b4fc;
+      border-radius: 50%;
+      animation: beacon 2s infinite;
+    }
+
+    @keyframes beacon {
+      0%, 100% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.3); }
+    }
+
+    header h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 44px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #ffffff 30%, #a5b4fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+      margin-bottom: 12px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 16px;
+      max-width: 680px;
+      line-height: 1.6;
+    }
+
+    /* Dashboard Info Card */
+    .info-card {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 18px;
+      padding: 24px;
+      margin-top: 32px;
+      margin-bottom: 40px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .info-details {
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .info-details h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-details p {
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .stats-container {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .stat-badge {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 12px 18px;
+      border-radius: 12px;
+      text-align: center;
+      min-width: 100px;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .stat-badge:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-hover);
+    }
+
+    .stat-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--accent-color);
+      text-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+
+    /* Main Grid - Reference & Compare Section */
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title span {
+      background: var(--accent-color);
+      width: 4px;
+      height: 24px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    .reference-section {
+      margin-bottom: 56px;
+    }
+
+    .reference-box {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Resolution Controls */
+    .resolution-control-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 30px;
+      background: var(--bg-card);
+      padding: 20px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .slider-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    .resolution-badge {
+      background: var(--accent-color);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
+
+    .slider-container {
+      position: relative;
+      width: 100%;
+      padding: 10px 0;
+    }
+
+    /* Custom Input Range */
+    input[type=range] {
+      -webkit-appearance: none;
+      width: 100%;
+      background: transparent;
+    }
+
+    input[type=range]:focus {
+      outline: none;
+    }
+
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      border: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      height: 20px;
+      width: 20px;
+      border-radius: 50%;
+      background: var(--text-main);
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 0 4px var(--accent-color);
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -7px;
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover {
+      transform: scale(1.25);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.7), 0 0 0 6px var(--accent-color);
+    }
+
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      padding: 0 5px;
+    }
+
+    .slider-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    .slider-label.active {
+      color: var(--accent-color);
+      font-weight: 700;
+    }
+
+    /* Compare Grid */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    @media (max-width: 768px) {
+      .compare-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .compare-pane {
+      background: var(--bg-card);
+      border: 1px solid rgba(255, 255, 255, 0.03);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.3s;
+    }
+
+    .compare-pane:hover {
+      border-color: var(--border-hover);
+    }
+
+    .pane-header {
+      padding: 14px 18px;
+      background: rgba(0, 0, 0, 0.2);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pane-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pane-info {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: 'Courier New', monospace;
+    }
+
+    .image-container {
+      flex: 1;
+      min-height: 280px;
+      background: #0a0a14;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .image-view-wrapper {
+      max-width: 100%;
+      max-height: 350px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      position: relative;
+      cursor: zoom-in;
+    }
+
+    .image-view-wrapper img {
+      display: block;
+      max-width: 100%;
+      max-height: 350px;
+      height: auto;
+      object-fit: contain;
+      transition: transform 0.4s ease;
+    }
+
+    .image-view-wrapper:hover img {
+      transform: scale(1.08);
+    }
+
+    .scan-overlay-btn {
+      position: absolute;
+      bottom: 12px;
+      right: 12px;
+      background: rgba(15, 15, 27, 0.85);
+      border: 1px solid var(--border-hover);
+      color: #ffffff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(4px);
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .scan-overlay-btn:hover {
+      background: var(--accent-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+
+    /* Consumer Section & Gallery */
+    .gallery-filters {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .search-input-wrapper {
+      position: relative;
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .search-input-wrapper input {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      padding: 12px 16px 12px 42px;
+      color: #ffffff;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-input-wrapper input:focus {
+      border-color: var(--accent-color);
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.15);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .filter-selectors {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .filter-selectors select {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+      min-width: 140px;
+      transition: border-color 0.2s;
+    }
+
+    .filter-selectors select:focus {
+      border-color: var(--accent-color);
+    }
+
+    /* Gallery Grid */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 24px;
+    }
+
+    .gallery-card {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s, box-shadow 0.3s;
+      position: relative;
+    }
+
+    .gallery-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--border-hover);
+      box-shadow: 0 15px 30px rgba(99, 102, 241, 0.15);
+    }
+
+    .card-img-holder {
+      height: 180px;
+      background: #09090f;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .card-img-holder img {
+      max-width: 100%;
+      max-height: 100%;
+      height: auto;
+      object-fit: contain;
+      border-radius: 6px;
+      transition: transform 0.3s;
+    }
+
+    .gallery-card:hover .card-img-holder img {
+      transform: scale(1.05);
+    }
+
+    /* RAW format styling */
+    .raw-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      color: var(--text-muted);
+      background: repeating-linear-gradient(
+        45deg,
+        rgba(251, 158, 11, 0.02),
+        rgba(251, 158, 11, 0.02) 10px,
+        rgba(0, 0, 0, 0) 10px,
+        rgba(0, 0, 0, 0) 20px
+      );
+      padding: 20px;
+      text-align: center;
+    }
+
+    .raw-icon {
+      font-size: 32px;
+      color: var(--color-warn);
+      filter: drop-shadow(0 0 6px rgba(245, 158, 11, 0.3));
+    }
+
+    .raw-badge {
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--color-warn);
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .card-tag {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 10px;
+      font-weight: 700;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-details {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 12px;
+    }
+
+    .card-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 600;
+      color: #ffffff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-metadata {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+    }
+
+    .meta-lbl {
+      color: var(--text-muted);
+    }
+
+    .meta-val {
+      font-family: 'Courier New', monospace;
+      color: #ffffff;
+      max-width: 140px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: auto;
+      border-top: 1px solid rgba(255, 255, 255, 0.03);
+      padding-top: 12px;
+    }
+
+    .btn {
+      flex: 1;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.1s;
+      border: 1px solid transparent;
+      outline: none;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background: var(--accent-color);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #4f46e5;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--border-hover);
+    }
+
+    .btn-disabled {
+      background: rgba(255, 255, 255, 0.02) !important;
+      border: 1px solid rgba(255, 255, 255, 0.05) !important;
+      color: rgba(255, 255, 255, 0.25) !important;
+      cursor: not-allowed;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(5, 5, 8, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      max-width: 900px;
+      width: 100%;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(99, 102, 241, 0.1);
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+      transform: scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .modal-overlay.active .modal {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .close-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--text-muted);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+    }
+
+    .close-btn:hover {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: rgba(239, 68, 68, 0.3);
+      color: var(--color-danger);
+      transform: rotate(90deg);
+    }
+
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .modal-body {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .modal-image-col {
+      background: #08080f;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.03);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      min-height: 300px;
+      position: relative;
+    }
+
+    .modal-image-col img {
+      max-width: 100%;
+      max-height: 400px;
+      border-radius: 8px;
+      object-fit: contain;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    }
+
+    .modal-info-col {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .info-group h3 {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+
+    .info-group p {
+      font-size: 14px;
+      color: var(--text-main);
+      line-height: 1.5;
+    }
+
+    .info-code {
+      font-family: 'Courier New', monospace;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      color: #a5b4fc;
+      word-break: break-all;
+    }
+
+    /* OCR Result styling inside modal */
+    .ocr-box {
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--bg-card);
+      margin-top: auto;
+    }
+
+    .ocr-header {
+      padding: 12px 16px;
+      background: rgba(99, 102, 241, 0.05);
+      border-bottom: 1px solid var(--border-color);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ocr-status-lbl {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ocr-spinner {
+      width: 12px;
+      height: 12px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: var(--accent-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .ocr-content {
+      padding: 16px;
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .ocr-empty-text {
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* Prediction Banner */
+    .prediction-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 14px;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .prediction-banner.safe {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--color-safe);
+      box-shadow: 0 0 15px var(--color-safe-glow);
+    }
+
+    .prediction-banner.warn {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--color-warn);
+      box-shadow: 0 0 15px var(--color-warn-glow);
+    }
+
+    .prediction-banner.block {
+      background: rgba(239, 68, 68, 0.08);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: var(--color-danger);
+      box-shadow: 0 0 15px var(--color-danger-glow);
+    }
+
+    .action-badge {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+
+    .risk-score {
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .risk-bar-bg {
+      background: rgba(255,255,255,0.05);
+      height: 4px;
+      width: 100%;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 8px;
+      margin-bottom: 12px;
+    }
+
+    .risk-bar-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 2px;
+      transition: width 0.6s cubic-bezier(0.1, 0.8, 0.2, 1);
+    }
+
+    .risk-bar-fill.safe { background: var(--color-safe); }
+    .risk-bar-fill.warn { background: var(--color-warn); }
+    .risk-bar-fill.block { background: var(--color-danger); }
+
+    .ocr-text-extracted {
+      font-size: 13px;
+      line-height: 1.6;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 8px;
+      padding: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.02);
+      color: #e2e8f0;
+      margin-bottom: 12px;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+
+    .ocr-keywords {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .keyword-tag {
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #fca5a5;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    /* Grid layout matching colors */
+    .c3pi { border-left: 3px solid #8b5cf6; }
+    .spl { border-left: 3px solid #10b981; }
+    .calibrated { border-left: 3px solid #f59e0b; }
+    .rxnav { border-left: 3px solid #3b82f6; }
+    
+    .c3pi-bg { background: rgba(139, 92, 246, 0.12); color: #d8b4fe; border: 1px solid rgba(139, 92, 246, 0.25); }
+    .spl-bg { background: rgba(16, 185, 129, 0.12); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.25); }
+    .calibrated-bg { background: rgba(245, 158, 11, 0.12); color: #fde047; border: 1px solid rgba(245, 158, 11, 0.25); }
+    .rxnav-bg { background: rgba(59, 130, 246, 0.12); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.25); }
+
+    /* Zoom modal */
+    .zoom-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(5, 5, 8, 0.95);
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      cursor: zoom-out;
+    }
+
+    .zoom-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .zoom-overlay img {
+      max-width: 95vw;
+      max-height: 95vh;
+      object-fit: contain;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+      border-radius: 8px;
+    }
+
+    /* Notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #1e1b4b;
+      border: 1px solid var(--border-hover);
+      color: #e0e7ff;
+      padding: 12px 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 3000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s;
+    }
+
+    .toast.active {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-icon {
+      color: var(--accent-color);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Header -->
+    <header>
+      <div class="badge-pill-main">
+        <span class="badge-dot"></span>
+        Fluoxetine 10 MG Oral Capsule
+      </div>
+      <h1>🛡️ Drug Dataset &amp; OCR Inspector</h1>
+      <p>Analyze pill images, compare resolutions, and verify DrugGuard's machine learning OCR capabilities directly on the NLM and C3PI datasets.</p>
+    </header>
+
+    <!-- Info & Summary Statistics -->
+    <div class="info-card" id="summary-section">
+      <div class="info-details">
+        <h2>NDC 00781-2823-13</h2>
+        <p>Fluoxetine is a selective serotonin reuptake inhibitor (SSRI) antidepressant. This visualizer lets you explore the reference images (from RxNav and NLM Base at 6 resolutions) and 17 consumer-grade pill images taken under various layouts and lighting conditions.</p>
+      </div>
+      <div class="stats-container">
+        <div class="stat-badge">
+          <div class="stat-value" id="stat-consumer-count">17</div>
+          <div class="stat-label">Consumer Files</div>
+        </div>
+        <div class="stat-badge">
+          <div class="stat-value" id="stat-reference-count">12</div>
+          <div class="stat-label">Reference Resol.</div>
+        </div>
+        <div class="stat-badge">
+          <div class="stat-value" id="stat-raw-count">2</div>
+          <div class="stat-label">RAW (CR2) Files</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reference Section -->
+    <section class="reference-section" id="reference-panel">
+      <h2 class="section-title"><span></span>Reference Images Resolution Inspector</h2>
+      
+      <div class="reference-box">
+        <!-- Resolution Control -->
+        <div class="resolution-control-panel">
+          <div class="slider-header">
+            <span class="slider-title">Selected Target Resolution</span>
+            <span class="resolution-badge" id="current-res-badge">300 px</span>
+          </div>
+          
+          <div class="slider-container">
+            <input type="range" id="res-slider" min="0" max="5" value="1" step="1" id="resolution-range" />
+            <div class="slider-labels">
+              <span class="slider-label" onclick="setSliderValue(0)">120px</span>
+              <span class="slider-label active" onclick="setSliderValue(1)">300px</span>
+              <span class="slider-label" onclick="setSliderValue(2)">600px</span>
+              <span class="slider-label" onclick="setSliderValue(3)">800px</span>
+              <span class="slider-label" onclick="setSliderValue(4)">1024px</span>
+              <span class="slider-label" onclick="setSliderValue(5)">Original</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- side-by-side grid -->
+        <div class="compare-grid">
+          
+          <!-- Pane 1: RXNAV -->
+          <div class="compare-pane">
+            <div class="pane-header">
+              <span class="pane-title">🖼️ RxNav API Image</span>
+              <span class="pane-info" id="rxnav-info">300x300</span>
+            </div>
+            <div class="image-container">
+              <div class="image-view-wrapper" onclick="openZoom(this)">
+                <img id="rxnav-img" src="/static/sampleData/reference/image/images/gallery/300/00781-2823-13_RXNAVIMAGE10_ED34F687.jpg" alt="RxNav Reference Image" />
+              </div>
+              <button class="scan-overlay-btn" id="rxnav-scan-btn" onclick="scanReferenceImage('rxnav')">
+                🔎 Run Scan
+              </button>
+            </div>
+          </div>
+
+          <!-- Pane 2: RXBASE -->
+          <div class="compare-pane">
+            <div class="pane-header">
+              <span class="pane-title">📸 NLM Base Reference</span>
+              <span class="pane-info" id="rxbase-info">300x300</span>
+            </div>
+            <div class="image-container">
+              <div class="image-view-wrapper" onclick="openZoom(this)">
+                <img id="rxbase-img" src="/static/sampleData/reference/image/images/gallery/300/00781-2823-13_NLMIMAGE10_ED34F687.jpg" alt="NLM Base Reference Image" />
+              </div>
+              <button class="scan-overlay-btn" id="rxbase-scan-btn" onclick="scanReferenceImage('rxbase')">
+                🔎 Run Scan
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Consumer Section -->
+    <section class="consumer-section" id="consumer-panel">
+      <h2 class="section-title"><span></span>Consumer Images Gallery</h2>
+      
+      <!-- Filters -->
+      <div class="gallery-filters">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          <input type="text" id="gallery-search" placeholder="Search images by name or disk..." oninput="applyFilters()" />
+        </div>
+        
+        <div class="filter-selectors">
+          <div class="filter-group">
+            <span class="filter-label">Layout:</span>
+            <select id="filter-layout" onchange="applyFilters()">
+              <option value="all">All Layouts</option>
+              <option value="C3PI_Reference">C3PI Reference</option>
+              <option value="MC_API_NLMIMAGE">NLM Image API</option>
+              <option value="MC_API_RXNAV">RxNav API</option>
+              <option value="MC_C3PI_REFERENCE_SEG">C3PI Segmented</option>
+              <option value="MC_COOKED_CALIBRATED">Cooked Calibrated</option>
+              <option value="MC_SPL_SPLIMAGE">SPL Image</option>
+            </select>
+          </div>
+          
+          <div class="filter-group">
+            <span class="filter-label">Format:</span>
+            <select id="filter-format" onchange="applyFilters()">
+              <option value="all">All Formats</option>
+              <option value="PNG">PNG Only</option>
+              <option value="JPG">JPG Only</option>
+              <option value="CR2">CR2 RAW</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gallery Grid -->
+      <div class="gallery-grid" id="gallery-grid-container">
+        <!-- Javascript will generate card elements here -->
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Detail & Scan Modal -->
+  <div class="modal-overlay" id="detail-modal" onclick="closeModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-title" id="modal-title-el">Fluoxetine 10 MG Capsule</span>
+        <button class="close-btn" onclick="closeModal(null)">&times;</button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- Image display -->
+        <div class="modal-image-col">
+          <div id="modal-img-container" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
+            <!-- Render standard img or CR2 raw placeholder -->
+          </div>
+        </div>
+
+        <!-- Info column -->
+        <div class="modal-info-col">
+          <div class="info-group">
+            <h3>Drug Name</h3>
+            <p id="modal-drug-name">Fluoxetine</p>
+          </div>
+          <div class="info-group">
+            <h3>National Drug Code (NDC11)</h3>
+            <p id="modal-ndc">00781282313</p>
+          </div>
+          <div class="info-group">
+            <h3>Layout Layout &amp; Lighting</h3>
+            <p id="modal-layout">MC_COOKED_CALIBRATED_V1.2</p>
+          </div>
+          <div class="info-group">
+            <h3>Relative File Path</h3>
+            <div class="info-code" id="modal-file-path">sampleData/consumer/PillProjectDisc63/...</div>
+          </div>
+
+          <!-- Live OCR section -->
+          <div class="ocr-box">
+            <div class="ocr-header">
+              <span class="ocr-status-lbl" id="ocr-status-header">
+                🛡️ DrugGuard OCR Scanner
+              </span>
+              <span id="ocr-spinner-container" style="display: none;">
+                <span class="ocr-spinner"></span>
+              </span>
+            </div>
+            
+            <div class="ocr-content" id="ocr-results-area">
+              <!-- Initial CTA / placeholder -->
+              <div id="ocr-cta-state">
+                <button class="btn btn-primary" style="width: 100%;" id="modal-scan-action-btn">
+                  🔎 Run Model OCR Scan
+                </button>
+                <p style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 8px;">
+                  Sends base64 image data to the FastAPI <code>/predict_image</code> endpoint.
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Zoom Overlay -->
+  <div class="zoom-overlay" id="zoom-overlay" onclick="closeZoom()">
+    <img id="zoom-img" src="" alt="Zoomed view" />
+  </div>
+
+  <!-- Toast Message -->
+  <div class="toast" id="toast-el">
+    <span class="toast-icon">💡</span>
+    <span id="toast-msg">Image scanned successfully!</span>
+  </div>
+
+  <!-- Script logic -->
+  <script>
+    // State management
+    let dataset = { consumer: [], reference: [] };
+    let filteredConsumer = [];
+    const resolutions = ["120", "300", "600", "800", "1024", "original"];
+
+    // Mapping Layout names to pretty formatting and classes
+    const layoutConfig = {
+      "C3PI_Reference": { label: "C3PI Reference", class: "c3pi", badge: "c3pi-bg" },
+      "MC_API_NLMIMAGE_V1.3": { label: "NLM Image API", class: "rxnav", badge: "rxnav-bg" },
+      "MC_API_RXNAV_V1.3": { label: "RxNav API", class: "rxnav", badge: "rxnav-bg" },
+      "MC_C3PI_REFERENCE_SEG_V1.6": { label: "C3PI Segmented", class: "c3pi", badge: "c3pi-bg" },
+      "MC_COOKED_CALIBRATED_V1.2": { label: "Cooked Calibrated", class: "calibrated", badge: "calibrated-bg" },
+      "MC_SPL_SPLIMAGE_V3.0": { label: "SPL Image", class: "spl", badge: "spl-bg" }
+    };
+
+    // Load dataset and initialize
+    window.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const response = await fetch("/static/sampleData/metadata.json");
+        dataset = await response.json();
+        
+        // Setup stats
+        document.getElementById("stat-consumer-count").innerText = dataset.consumer.length;
+        const rawCount = dataset.consumer.filter(c => c.Image.endsWith(".CR2")).length;
+        document.getElementById("stat-raw-count").innerText = rawCount;
+
+        // Populate gallery
+        filteredConsumer = [...dataset.consumer];
+        renderGallery();
+
+        // Setup slider listener
+        document.getElementById("res-slider").addEventListener("input", handleSliderChange);
+
+        showToast("Dataset loaded successfully!");
+      } catch (err) {
+        console.error("Failed to load metadata.json:", err);
+        showToast("Error loading dataset metadata.");
+      }
+    });
+
+    // Reference slider control
+    function handleSliderChange(e) {
+      const index = parseInt(e.target.value);
+      const res = resolutions[index];
+      
+      // Update label
+      document.getElementById("current-res-badge").innerText = res === "original" ? "Original Size" : `${res} px`;
+      
+      // Update active class in labels
+      const labels = document.querySelectorAll(".slider-label");
+      labels.forEach((lbl, idx) => {
+        if (idx === index) {
+          lbl.classList.add("active");
+        } else {
+          lbl.classList.remove("active");
+        }
+      });
+
+      // Swap images
+      const refData = dataset.reference[0];
+      if (!refData) return;
+
+      const rxnavImg = document.getElementById("rxnav-img");
+      const rxbaseImg = document.getElementById("rxbase-img");
+      
+      const rxnavPath = res === "original" ? refData["RXNAV ORIGINAL"] : refData[`RXNAV ${res}`];
+      const rxbasePath = res === "original" ? refData["RXBASE ORIGINAL"] : refData[`RXBASE ${res}`];
+
+      rxnavImg.src = `/static/sampleData/reference/${rxnavPath}`;
+      rxbaseImg.src = `/static/sampleData/reference/${rxbasePath}`;
+
+      // Update resolution display text
+      const dimensions = {
+        "120": "120x120",
+        "300": "300x300",
+        "600": "600x600",
+        "800": "800x800",
+        "1024": "1024x1024",
+        "original": "Original (high res)"
+      };
+
+      document.getElementById("rxnav-info").innerText = dimensions[res];
+      document.getElementById("rxbase-info").innerText = dimensions[res];
+    }
+
+    function setSliderValue(index) {
+      document.getElementById("res-slider").value = index;
+      // Trigger event manually
+      const event = new Event("input");
+      document.getElementById("res-slider").dispatchEvent(event);
+    }
+
+    // Zoom Image Control
+    function openZoom(wrapper) {
+      const img = wrapper.querySelector("img");
+      const overlay = document.getElementById("zoom-overlay");
+      const zoomImg = document.getElementById("zoom-img");
+      zoomImg.src = img.src;
+      overlay.classList.add("active");
+    }
+
+    function closeZoom() {
+      document.getElementById("zoom-overlay").classList.remove("active");
+    }
+
+    // Filter Logic
+    function applyFilters() {
+      const searchVal = document.getElementById("gallery-search").value.toLowerCase();
+      const layoutFilter = document.getElementById("filter-layout").value;
+      const formatFilter = document.getElementById("filter-format").value;
+
+      filteredConsumer = dataset.consumer.filter(item => {
+        // Search
+        const nameMatch = item.Name.toLowerCase().includes(searchVal) || 
+                          item.Image.toLowerCase().includes(searchVal);
+        
+        // Layout
+        let layoutMatch = true;
+        if (layoutFilter !== "all") {
+          layoutMatch = item.Layout.startsWith(layoutFilter);
+        }
+
+        // Format
+        let formatMatch = true;
+        if (formatFilter !== "all") {
+          const ext = item.Image.split('.').pop().toUpperCase();
+          formatMatch = ext === formatFilter;
+        }
+
+        return nameMatch && layoutMatch && formatMatch;
+      });
+
+      renderGallery();
+    }
+
+    // Render consumer cards
+    function renderGallery() {
+      const container = document.getElementById("gallery-grid-container");
+      container.innerHTML = "";
+
+      if (filteredConsumer.length === 0) {
+        container.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 48px; color: var(--text-muted);">
+            <p style="font-size: 16px;">No consumer images found matching the filters.</p>
+            <button class="btn btn-secondary" style="margin-top: 14px; display: inline-flex;" onclick="resetFilters()">Reset Filters</button>
+          </div>
+        `;
+        return;
+      }
+
+      filteredConsumer.forEach((item, index) => {
+        const ext = item.Image.split('.').pop().toUpperCase();
+        const filename = item.Image.split('/').pop();
+        const layoutObj = layoutConfig[item.Layout] || { label: item.Layout, class: "", badge: "c3pi-bg" };
+        
+        const card = document.createElement("div");
+        card.className = `gallery-card ${layoutObj.class}`;
+
+        let imgHtml = "";
+        let scanBtnDisabledClass = "";
+        let scanAction = `onclick="openDetailModal(${index}, true)"`;
+
+        if (ext === "CR2") {
+          imgHtml = `
+            <div class="raw-placeholder">
+              <span class="raw-icon">📷</span>
+              <span class="raw-badge">RAW CR2</span>
+              <span style="font-size: 11px; margin-top: 4px;">RAW camera file</span>
+            </div>
+          `;
+          scanBtnDisabledClass = "btn-disabled";
+          scanAction = `onclick="openDetailModal(${index}, false)"`;
+        } else {
+          const imgUrl = `/static/sampleData/consumer/${item.Image}`;
+          imgHtml = `<img src="${imgUrl}" alt="${item.Name}" />`;
+        }
+
+        card.innerHTML = `
+          <div class="card-img-holder">
+            <span class="card-tag ${layoutObj.badge}">${layoutObj.label}</span>
+            ${imgHtml}
+          </div>
+          <div class="card-details">
+            <div class="card-title" title="${filename}">${filename}</div>
+            <div class="card-metadata">
+              <div class="meta-row">
+                <span class="meta-lbl">NDC11:</span>
+                <span class="meta-val">${item.NDC11}</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-lbl">Pill Name:</span>
+                <span class="meta-val">${item.Name}</span>
+              </div>
+              <div class="meta-row">
+                <span class="meta-lbl">Format:</span>
+                <span class="meta-val">${ext}</span>
+              </div>
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-secondary" onclick="openDetailModal(${index}, false)">
+                ℹ️ Details
+              </button>
+              <button class="btn btn-primary ${scanBtnDisabledClass}" ${scanAction}>
+                🔎 Scan
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function resetFilters() {
+      document.getElementById("gallery-search").value = "";
+      document.getElementById("filter-layout").value = "all";
+      document.getElementById("filter-format").value = "all";
+      applyFilters();
+    }
+
+    // Modal Control
+    let activeModalItem = null;
+
+    function openDetailModal(index, autoScan = false) {
+      const item = filteredConsumer[index];
+      activeModalItem = item;
+      
+      const ext = item.Image.split('.').pop().toUpperCase();
+      const filename = item.Image.split('/').pop();
+      const layoutObj = layoutConfig[item.Layout] || { label: item.Layout };
+
+      document.getElementById("modal-title-el").innerText = filename;
+      document.getElementById("modal-drug-name").innerText = item.Name + " (10 MG Capsule)";
+      document.getElementById("modal-ndc").innerText = `00781-2823-13 (Format: 00781282313)`;
+      document.getElementById("modal-layout").innerText = `${layoutObj.label} (${item.Layout})`;
+      document.getElementById("modal-file-path").innerText = `sampleData/consumer/${item.Image}`;
+
+      const imgContainer = document.getElementById("modal-img-container");
+      imgContainer.innerHTML = "";
+
+      if (ext === "CR2") {
+        imgContainer.innerHTML = `
+          <div class="raw-placeholder" style="border: 1px dashed rgba(255,255,255,0.1); border-radius: 12px; height: 320px; width: 100%;">
+            <span class="raw-icon" style="font-size: 54px;">📷</span>
+            <span class="raw-badge" style="font-size: 13px; padding: 4px 10px;">RAW CR2 Format</span>
+            <p style="font-size: 13px; color: var(--text-muted); max-width: 250px; margin-top: 6px;">
+              RAW image files cannot be loaded by browser engines. Convert to JPEG or PNG to scan.
+            </p>
+          </div>
+        `;
+        
+        // Hide scan elements
+        document.getElementById("ocr-results-area").innerHTML = `
+          <div style="text-align: center; color: var(--text-muted); font-size: 13px; font-style: italic; padding: 20px;">
+            ⚠️ Scan unavailable for RAW files.
+          </div>
+        `;
+      } else {
+        const imgUrl = `/static/sampleData/consumer/${item.Image}`;
+        imgContainer.innerHTML = `<img src="${imgUrl}" alt="${item.Name}" />`;
+
+        // Reset Scan UI
+        resetOcrScanUI();
+      }
+
+      const modal = document.getElementById("detail-modal");
+      modal.classList.add("active");
+
+      if (autoScan && ext !== "CR2") {
+        runOcrScan();
+      }
+    }
+
+    function closeModal(e) {
+      if (e === null || e.target === document.getElementById("detail-modal")) {
+        document.getElementById("detail-modal").classList.remove("active");
+        activeModalItem = null;
+      }
+    }
+
+    function resetOcrScanUI() {
+      const resultsArea = document.getElementById("ocr-results-area");
+      resultsArea.innerHTML = `
+        <div id="ocr-cta-state">
+          <button class="btn btn-primary" style="width: 100%;" id="modal-scan-action-btn" onclick="runOcrScan()">
+            🔎 Run Model OCR Scan
+          </button>
+          <p style="font-size: 11px; color: var(--text-muted); text-align: center; margin-top: 8px;">
+            Sends base64 image data to the FastAPI <code>/predict_image</code> endpoint.
+          </p>
+        </div>
+      `;
+    }
+
+    // Convert Image file to Base64
+    async function imageToBase64(url) {
+      const response = await fetch(url);
+      const blob = await response.blob();
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          // returns dataURL
+          resolve(reader.result);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
+      });
+    }
+
+    // Call predict_image API
+    async function runOcrScan() {
+      if (!activeModalItem) return;
+
+      const imgUrl = `/static/sampleData/consumer/${activeModalItem.Image}`;
+      
+      // Update UI to loading state
+      const resultsArea = document.getElementById("ocr-results-area");
+      resultsArea.innerHTML = `
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px; padding: 24px; min-height: 120px;">
+          <span class="ocr-spinner" style="width:32px; height:32px; border-width: 4px;"></span>
+          <span style="font-size: 13px; color: var(--text-muted);">Processing image &amp; running OCR...</span>
+        </div>
+      `;
+      
+      document.getElementById("ocr-spinner-container").style.display = "block";
+
+      try {
+        // Fetch and convert image
+        const base64Data = await imageToBase64(imgUrl);
+
+        // Call backend API
+        const response = await fetch("/predict_image", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            image: base64Data
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`);
+        }
+
+        const result = await response.json();
+        renderOcrResults(result);
+        showToast("Image OCR prediction loaded!");
+      } catch (err) {
+        console.error("OCR prediction failed:", err);
+        resultsArea.innerHTML = `
+          <div style="color: var(--color-danger); text-align: center; font-size: 13px; padding: 20px;">
+            ❌ Scan failed. Ensure uvicorn FastAPI backend is running on port 8000.
+            <div style="font-size:11px; margin-top:8px; color:var(--text-muted); font-family:monospace;">${err.message}</div>
+          </div>
+        `;
+      } finally {
+        document.getElementById("ocr-spinner-container").style.display = "none";
+      }
+    }
+
+    // Scan reference images directly from overlay button
+    async function scanReferenceImage(type) {
+      const img = document.getElementById(type === "rxnav" ? "rxnav-img" : "rxbase-img");
+      const btn = document.getElementById(type === "rxnav" ? "rxnav-scan-btn" : "rxbase-scan-btn");
+      
+      const originalText = btn.innerHTML;
+      btn.innerHTML = `<span class="ocr-spinner" style="width:10px; height:10px; border-width: 1.5px;"></span> Scanning`;
+      btn.disabled = true;
+
+      try {
+        const base64Data = await imageToBase64(img.src);
+        const response = await fetch("/predict_image", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            image: base64Data
+          })
+        });
+
+        if (!response.ok) throw new Error(`Status ${response.status}`);
+        const result = await response.json();
+        
+        // Show result in a custom overlay alert
+        alert(`Prediction: ${result.action.toUpperCase()} (Confidence: ${result.confidence}%)\n\nOCR Extracted Text: "${result.triggered_words.length > 0 ? 'Drug signs detected' : 'No drug text detected'}"\nTriggered: [${result.triggered_words.join(", ")}]`);
+        showToast("Scan finished!");
+      } catch (err) {
+        console.error("Reference scan failed:", err);
+        alert(`Reference scan failed: ${err.message}\nMake sure uvicorn FastAPI is running on port 8000.`);
+      } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+      }
+    }
+
+    // Render results in the DOM
+    function renderOcrResults(res) {
+      const resultsArea = document.getElementById("ocr-results-area");
+      
+      const actionClass = res.action; // "safe" / "warn" / "block"
+      const actionIcon = res.action === "safe" ? "🟢" : res.action === "warn" ? "🟡" : "🔴";
+      const actionText = res.action === "safe" ? "SAFE CONTENT" : res.action === "warn" ? "WARN INTERVENTION" : "BLOCK CONTENT";
+
+      let keywordsHtml = "";
+      if (res.triggered_words && res.triggered_words.length > 0) {
+        keywordsHtml = `
+          <div class="ocr-keywords">
+            ${res.triggered_words.map(w => `<span class="keyword-tag">${w}</span>`).join("")}
+          </div>
+        `;
+      } else {
+        keywordsHtml = `<div style="font-size: 11px; color: var(--text-muted);">None</div>`;
+      }
+
+      resultsArea.innerHTML = `
+        <div class="prediction-banner ${actionClass}">
+          <span class="action-badge">${actionIcon} ${actionText}</span>
+          <span class="risk-score">Risk: ${(res.risk_score * 100).toFixed(1)}%</span>
+        </div>
+
+        <div class="info-group" style="margin-bottom: 12px;">
+          <h3>Prediction confidence</h3>
+          <div class="risk-bar-bg">
+            <div class="risk-bar-fill ${actionClass}" style="width: ${res.confidence}%"></div>
+          </div>
+        </div>
+
+        <div class="info-group">
+          <h3>Triggered Words (Drugs)</h3>
+          ${keywordsHtml}
+        </div>
+      `;
+    }
+
+    // Toast Control
+    function showToast(msg) {
+      const toast = document.getElementById("toast-el");
+      document.getElementById("toast-msg").innerText = msg;
+      toast.classList.add("active");
+      setTimeout(() => {
+        toast.classList.remove("active");
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+env/
+
+# Ignore entire sampleData directory
+sampleData/
+
+# Editors & System
+.vscode/
+.idea/
+.gemini/
+.DS_Store
+Thumbs.db

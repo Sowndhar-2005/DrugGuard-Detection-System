@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Street Market Forum</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+      background: #f5f5f5;
+      color: #222;
+      padding: 0 20px;
+    }
+    h1 { color: #333; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+    .post {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 18px;
+    }
+    .post-user { font-weight: bold; color: #555; font-size: 13px; margin-bottom: 6px; }
+    .post p { font-size: 15px; line-height: 1.6; margin: 0; }
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .tag.drug { background: #fde8e8; color: #c0392b; }
+    .tag.safe { background: #e8fde8; color: #27ae60; }
+  </style>
+</head>
+<body>
+
+  <h1>💬 Community Forum</h1>
+
+  <!-- DRUG POST 1 — should be BLOCKED -->
+  <div class="post">
+    <span class="tag drug">Post #1</span>
+    <div class="post-user">user_darkweb99</div>
+    <p>Got powder available for pickup tonight, DM for prices. Fresh batch just arrived from the supplier. Fast delivery guaranteed to your doorstep, discreet packaging only.</p>
+  </div>
+
+  <!-- SAFE POST — should be untouched -->
+  <div class="post">
+    <span class="tag safe">Post #2</span>
+    <div class="post-user">sarah_j</div>
+    <p>Just finished reading a great book about machine learning. Anyone recommend a good course for beginners? Looking for study partners for the math exam next week.</p>
+  </div>
+
+  <!-- DRUG POST 2 — should be BLOCKED -->
+  <div class="post">
+    <span class="tag drug">Post #3</span>
+    <div class="post-user">plug_connect</div>
+    <p>Moving pills across the border this weekend. Need a reliable connect in midtown. Wholesale stash available, bulk discounts apply. Hit me up, encrypted payments only.</p>
+  </div>
+
+  <!-- SAFE POST 2 -->
+  <div class="post">
+    <span class="tag safe">Post #4</span>
+    <div class="post-user">tom_cooks</div>
+    <p>Had an amazing pizza at the new cafe downtown. Going to the park this weekend with family. The weather has been beautiful lately in the bay area!</p>
+  </div>
+
+  <!-- DRUG POST 3 — emoji coded -->
+  <div class="post">
+    <span class="tag drug">Post #5</span>
+    <div class="post-user">emoji_dealer</div>
+    <p>Got that 🍃🍃🍃 ready for pickup, DM me for prices. 🔌 got the best ❄️ in town. Fresh 💊💊 just landed, first come first served. Quality goods guaranteed 🔥</p>
+  </div>
+
+  <!-- SAFE POST 3 -->
+  <div class="post">
+    <span class="tag safe">Post #6</span>
+    <div class="post-user">mike_dev</div>
+    <p>Started learning Python online, really enjoying it. Working on a coding project for my class. Anyone want to join a study group? Meeting at the library on Saturday.</p>
+  </div>
+
+</body>
+</html>

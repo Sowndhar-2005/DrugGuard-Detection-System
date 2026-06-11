@@ -26,10 +26,10 @@ def main() -> None:
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.20, random_state=42, stratify=y
     )
-    print(f"Split → Train: {len(X_train)}  |  Test: {len(X_test)}\n")
+    print(f"Split -> Train: {len(X_train)}  |  Test: {len(X_test)}\n")
 
-    # Vectorization (Bag of Words)
-    vectorizer = CountVectorizer()
+    # Vectorization (Bag of Words) with emoji and stopword support
+    vectorizer = CountVectorizer(token_pattern=r'(?u)\b\w+\b|[^\x00-\x7F]', stop_words='english')
     X_train_vec = vectorizer.fit_transform(X_train)
     X_test_vec = vectorizer.transform(X_test)
 
@@ -57,8 +57,8 @@ def main() -> None:
     with open("vectorizer.pkl", "wb") as f:
         pickle.dump(vectorizer, f)
 
-    print("Model saved      → text_model.pkl")
-    print("Vectorizer saved  → vectorizer.pkl")
+    print("Model saved      -> text_model.pkl")
+    print("Vectorizer saved  -> vectorizer.pkl")
 
 
 if __name__ == "__main__":
