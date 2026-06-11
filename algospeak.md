@@ -45,17 +45,9 @@ The proposed system adopts a client-server architecture designed to detect and s
 2. **The FastAPI Backend Server**: Hosts the Multinomial Naive Bayes text classifier and the RapidOCR image text extraction engine.
 3. **The Decision and UI Intervention Module**: Dynamically applies visual overlays (blurring or warning borders) to the webpage DOM based on the classifier's output.
 
-```
-+-----------------------------------+               +-------------------------------------+
-|      Chrome Extension (Client)    |               |        FastAPI Backend Server       |
-|                                   |               |                                     |
-|  [DOM Text Node] --(Raw Text)-----+-------------> |  [Semantic Normalization Layer]     |
-|                                   |               |                |                    |
-|  [Image Elements] -(Base64 Img)---+--->[RapidOCR] |        (Normalized Text)            |
-|                                   |         |     |                v                    |
-|  [UI Intervention: Blur / Warn]   |<--(Action JSON)-- [Multinomial Naive Bayes Model]   |
-+-----------------------------------+               +-------------------------------------+
-```
+The comprehensive system structure and component interactions are depicted in the architectural diagram in Fig. 1.
+
+![Fig. 1: Architectural Diagram](algospeak_media/img_0001.png)
 
 #### B. Browser Extension (Client Layer)
 The browser extension is implemented using the Chrome Extension Manifest V3 API and serves as the interface between the user's browsing session and the detection backend. A `MutationObserver` instance is registered against the DOM to continuously monitor structural changes, enabling detection of dynamically loaded content such as infinite-scroll posts and asynchronously rendered comments without requiring page reloads.
@@ -73,7 +65,11 @@ Visual inputs (flyers, ad images) are processed on the backend using `RapidOCR`.
 #### A. Input Preprocessing and Vectorization
 Let the input text be denoted as $T_{raw}$. The normalized representation $T_{norm}$ is obtained via:
 $$T_{norm} = f_{norm}(T_{raw})$$
-where $f_{norm}(\cdot)$ represents the composite normalization function mapping emojis, slang, and leetspeak to canonical tokens. The normalized text is converted into a numerical feature vector $X$ using a Bag of Words `CountVectorizer` configured to support emoji character patterns:
+where $f_{norm}(\cdot)$ represents the composite normalization function mapping emojis, slang, and leetspeak to canonical tokens. The detailed stages of this preprocessing pipeline are illustrated in Fig. 2.
+
+![Fig. 2: Semantic Normalization](algospeak_media/img_0002.jpeg)
+
+The normalized text is converted into a numerical feature vector $X$ using a Bag of Words `CountVectorizer` configured to support emoji character patterns:
 $$X = \text{CountVectorizer}(T_{norm})$$
 
 #### B. Text Classification Using Multinomial Naive Bayes
@@ -81,6 +77,10 @@ The vector $X$ is passed to a trained Multinomial Naive Bayes classifier. Under 
 $$P(c | X) \propto P(c) \prod_{i=1}^{V} P(x_i | c)$$
 where $P(c)$ is the prior probability of class $c$, $V$ is the vocabulary size, and $P(x_i | c)$ is the conditional probability of feature $x_i$ occurring in class $c$. The final risk score $S$ is defined as the posterior probability of the illicit class:
 $$S = P(c=1 | X)$$
+
+The integration of visual OCR text with direct semantic classification represents the core multimodal fusion strategy, shown in Fig. 3.
+
+![Fig. 3: Multimodal Fusion Strategy](algospeak_media/img_0003.jpeg)
 
 #### C. Decision Policy and UI Intervention
 The computed risk score $S$ drives client-side UI modifications based on the following threshold policy:
@@ -90,10 +90,27 @@ The computed risk score $S$ drives client-side UI modifications based on the fol
 
 ---
 
-### V. RESULTS AND EVALUATION
+### V. DATASET AND TRAINING
+
+#### A. Dataset Description
+The system is trained and evaluated using a dataset designed to capture both explicit and algospeak-encoded drug-related content. The composition of the training data categories is shown in Fig. 4.
+
+![Fig. 4: Dataset Composition](algospeak_media/img_0004.jpeg)
+
+* **Positive-Class Samples**: Text containing direct trafficking terms and emoji-coded slang.
+* **Negative-Class Samples (Hard Negatives)**: Safe sentences that contain drug-adjacent terms (e.g. news reports of drug busts, legitimate medical prescriptions, and standard delivery listings) to train the model on context.
+
+#### B. Data Splitting
+The dataset consists of 1,200 samples and is partitioned using stratified sampling to preserve class distribution across splits: Training Set (70%), Validation Set (15%), and Test Set (15%), as shown in Fig. 5.
+
+![Fig. 5: Dataset Split Distribution](algospeak_media/img_0005.jpeg)
+
+---
+
+### VI. RESULTS AND EVALUATION
 
 #### A. Quantitative Results
-The system was evaluated on a test split of a manually curated dataset consisting of 1,200 rows (600 drug trafficking samples, including emoji-coded texts, and 600 safe samples including hard negatives such as medical texts, news articles, and standard e-commerce listings). Table I details the results.
+The system was evaluated on a test split of 1,200 rows. Table I details the results.
 
 | Model Modality | Accuracy | Precision | Recall | F1-Score |
 | :--- | :---: | :---: | :---: | :---: |
@@ -102,31 +119,37 @@ The system was evaluated on a test split of a manually curated dataset consistin
 | **Multinomial Naive Bayes (Text Only)** | **98.33%** | **0.97** | **1.00** | **0.98** |
 | **RapidOCR + Naive Bayes (Multimodal)** | **98.33%** | **0.97** | **1.00** | **0.98** |
 
+The substantial impact of applying the semantic normalization layer to decode emojis and slang prior to vectorization is quantified via the ablation study in Fig. 6.
+
+![Fig. 6: Effect of Semantic Normalization](algospeak_media/img_0006.jpeg)
+
 #### B. Real-Time Performance and Latency
-The primary objective of this architecture is low-latency, real-time protection. The processing pipeline timings are as follows:
+The processing pipeline timings are illustrated in the end-to-end inference latency breakdown in Fig. 7:
 - **Text Classification Latency**: **< 5 ms** (including Vectorization and Naive Bayes inference).
 - **Image OCR and Extraction**: **150 ms – 300 ms** (using RapidOCR).
 - **End-to-End Latency**: **250 ms – 300 ms** (including network round-trip).
 
+![Fig. 7: End-to-End Inference Latency Breakdown](algospeak_media/img_0007.jpeg)
+
 This extremely low latency ensures that content is blurred or flagged before the user is able to read the illicit advertisement.
 
 #### C. Live Intervention Case Studies
-The Chrome extension was tested on local sandboxes to evaluate the three UI states. The visual results are shown below in Fig. 2:
+The Chrome extension was tested on local sandboxes to evaluate the three UI states. The visual results are shown below in Fig. 8:
 
-| **Fig. 2.1: Borderline Content (Warned)** | **Fig. 2.2: Safe Content (Allowed)** | **Fig. 2.3: High-Risk Content (Blocked)** |
+| **Fig. 8.1: Borderline Content (Warned)** | **Fig. 8.2: Safe Content (Allowed)** | **Fig. 8.3: High-Risk Content (Blocked)** |
 | :---: | :---: | :---: |
 | ![Warning Outline](algospeak_media/Screenshot%202026-06-11%20234801.png) | ![Safe Text Untouched](algospeak_media/Screenshot%202026-06-11%20234935.png) | ![Blurred Content Banner](algospeak_media/Screenshot%202026-06-11%20235049.png) |
 | Borderline text elements are marked with a yellow border and warning icon. | Legitimate and everyday text remains completely untouched. | High-risk trafficking messages are blurred and hidden with a red shield banner. |
 
 ---
 
-### VI. CONCLUSION
+### VII. CONCLUSION
 
 This paper presented a real-time, algospeak-resilient drug trafficking detection system that integrates a Multinomial Naive Bayes classifier, a RapidOCR image extraction backend, and a Manifest V3 Chrome extension. By using a semantic normalization layer to map emojis, slang, and leetspeak prior to inference, the text classifier achieves a 98.33% accuracy score on algospeak-heavy test cases. The client-side extension dynamically alters webpage DOM elements in under 5 ms for text, providing immediate protection. Future work will explore expanding the normalization dictionary dynamically through community-driven feedback loops and expanding visual classification to detect substance categories directly.
 
 ---
 
-### REFERENCES
+### VIII. REFERENCES
 
 * [1] K. Alfatmi et al., "LLM-Empowered Detection of Illicit Messages on Social Networks," *Journal of Cybersecurity*, 2025.
 * [2] K. Alfatmi et al., "Narcotrace: Advanced Detection System for Social Media-Based Drug Trafficking," *Proc. INCOFT*, 2025.
