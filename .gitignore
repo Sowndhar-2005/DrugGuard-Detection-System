@@ -14,3 +14,6 @@ sampleData/
 .gemini/
 .DS_Store
 Thumbs.db
+.git_backup
+**/.git_backup/
+
