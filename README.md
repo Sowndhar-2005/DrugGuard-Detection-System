@@ -9,7 +9,7 @@ Online social platforms and messaging apps are increasingly exploited for illici
 ---
 
 ## 📄 Paper
-- IEEE paper (PDF): [algospeak..pdf](algospeak..pdf)
+- IEEE paper (PDF): [algospeak..pdf](algospeak..pdf) and [algospeak..pdf](algospeak..md) 
 
 ---
 
