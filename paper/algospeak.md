@@ -47,7 +47,7 @@ The proposed system adopts a client-server architecture designed to detect and s
 
 The comprehensive system structure and component interactions are depicted in the architectural diagram in Fig. 1.
 
-![Fig. 1: Architectural Diagram](media/img_0001.png)
+![Fig. 1: Architectural Diagram](../media/img_0001.png)
 
 #### B. Browser Extension (Client Layer)
 The browser extension is implemented using the Chrome Extension Manifest V3 API and serves as the interface between the user's browsing session and the detection backend. A `MutationObserver` instance is registered against the DOM to continuously monitor structural changes, enabling detection of dynamically loaded content such as infinite-scroll posts and asynchronously rendered comments without requiring page reloads.
@@ -67,7 +67,7 @@ Let the input text be denoted as $T_{raw}$. The normalized representation $T_{no
 $$T_{norm} = f_{norm}(T_{raw})$$
 where $f_{norm}(\cdot)$ represents the composite normalization function mapping emojis, slang, and leetspeak to canonical tokens. The detailed stages of this preprocessing pipeline are illustrated in Fig. 2.
 
-![Fig. 2: Semantic Normalization](media/img_0002.jpeg)
+![Fig. 2: Semantic Normalization](../media/img_0002.jpeg)
 
 The normalized text is converted into a numerical feature vector $X$ using a Bag of Words `CountVectorizer` configured to support emoji character patterns:
 $$X = \text{CountVectorizer}(T_{norm})$$
@@ -80,7 +80,7 @@ $$S = P(c=1 | X)$$
 
 The integration of visual OCR text with direct semantic classification represents the core multimodal fusion strategy, shown in Fig. 3.
 
-![Fig. 3: Multimodal Fusion Strategy](media/img_0003.jpeg)
+![Fig. 3: Multimodal Fusion Strategy](../media/img_0003.jpeg)
 
 #### C. Decision Policy and UI Intervention
 The computed risk score $S$ drives client-side UI modifications based on the following threshold policy:
@@ -95,7 +95,7 @@ The computed risk score $S$ drives client-side UI modifications based on the fol
 #### A. Dataset Description
 The system is trained and evaluated using a dataset designed to capture both explicit and algospeak-encoded drug-related content. The composition of the training data categories is shown in Fig. 4.
 
-![Fig. 4: Dataset Composition](media/img_0004.jpeg)
+![Fig. 4: Dataset Composition](../media/img_0004.jpeg)
 
 * **Positive-Class Samples**: Text containing direct trafficking terms and emoji-coded slang.
 * **Negative-Class Samples (Hard Negatives)**: Safe sentences that contain drug-adjacent terms (e.g. news reports of drug busts, legitimate medical prescriptions, and standard delivery listings) to train the model on context.
@@ -103,7 +103,7 @@ The system is trained and evaluated using a dataset designed to capture both exp
 #### B. Data Splitting
 The dataset consists of 1,200 samples and is partitioned using stratified sampling to preserve class distribution across splits: Training Set (70%), Validation Set (15%), and Test Set (15%), as shown in Fig. 5.
 
-![Fig. 5: Dataset Split Distribution](media/img_0005.jpeg)
+![Fig. 5: Dataset Split Distribution](../media/img_0005.jpeg)
 
 ---
 
@@ -121,7 +121,7 @@ The system was evaluated on a test split of 1,200 rows. Table I details the resu
 
 The substantial impact of applying the semantic normalization layer to decode emojis and slang prior to vectorization is quantified via the ablation study in Fig. 6.
 
-![Fig. 6: Effect of Semantic Normalization](media/img_0006.jpeg)
+![Fig. 6: Effect of Semantic Normalization](../media/img_0006.jpeg)
 
 #### B. Real-Time Performance and Latency
 The processing pipeline timings are illustrated in the end-to-end inference latency breakdown in Fig. 7:
@@ -129,7 +129,7 @@ The processing pipeline timings are illustrated in the end-to-end inference late
 - **Image OCR and Extraction**: **150 ms – 300 ms** (using RapidOCR).
 - **End-to-End Latency**: **250 ms – 300 ms** (including network round-trip).
 
-![Fig. 7: End-to-End Inference Latency Breakdown](media/img_0007.jpeg)
+![Fig. 7: End-to-End Inference Latency Breakdown](../media/img_0007.jpeg)
 
 This extremely low latency ensures that content is blurred or flagged before the user is able to read the illicit advertisement.
 
@@ -138,7 +138,7 @@ The Chrome extension was tested on local sandboxes to evaluate the three UI stat
 
 | **Fig. 8.1: Borderline Content (Warned)** | **Fig. 8.2: Safe Content (Allowed)** | **Fig. 8.3: High-Risk Content (Blocked)** |
 | :---: | :---: | :---: |
-| ![Warning Outline](media/Screenshot%202026-06-11%20234801.png) | ![Safe Text Untouched](media/Screenshot%202026-06-11%20234935.png) | ![Blurred Content Banner](media/Screenshot%202026-06-11%20235049.png) |
+| ![Warning Outline](../media/Screenshot%202026-06-11%20234801.png) | ![Safe Text Untouched](../media/Screenshot%202026-06-11%20234935.png) | ![Blurred Content Banner](../media/Screenshot%202026-06-11%20235049.png) |
 | Borderline text elements are marked with a yellow border and warning icon. | Legitimate and everyday text remains completely untouched. | High-risk trafficking messages are blurred and hidden with a red shield banner. |
 
 ---

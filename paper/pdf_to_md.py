@@ -2,7 +2,7 @@
 pdf_to_md.py
 Converts a PDF to Markdown using PyMuPDF (fitz).
 - Extracts text with basic formatting (headings, paragraphs)
-- Extracts all embedded images and saves to algospeak_media/
+- Extracts all embedded images and saves to media/
 - Embeds image references in the Markdown output
 """
 
@@ -13,7 +13,7 @@ import re
 
 PDF_PATH = "algospeak..pdf"
 MD_PATH = "algospeak.md"
-MEDIA_DIR = "algospeak_media"
+MEDIA_DIR = "../media"
 
 os.makedirs(MEDIA_DIR, exist_ok=True)
 

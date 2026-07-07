@@ -9,7 +9,7 @@ Online social platforms and messaging apps are increasingly exploited for illici
 ---
 
 ## 📄 Paper
-- IEEE paper (PDF): [algospeak..pdf](algospeak..pdf)
+- IEEE paper: [algospeak..pdf](paper/algospeak..pdf) and [algospeak.md](paper/algospeak.md)
 
 ---
 
@@ -19,7 +19,7 @@ Here is the DrugGuard extension running locally and intercepting content on our 
 
 | **1. Detection & Warning Intervention** | **2. Safe Content Allowed** | **3. High-Risk Content Blocked** |
 | :---: | :---: | :---: |
-| ![Warning Outline](algospeak_media/Screenshot%202026-06-11%20234801.png) | ![Safe Text Untouched](algospeak_media/Screenshot%202026-06-11%20234935.png) | ![Blurred Content Banner](algospeak_media/Screenshot%202026-06-11%20235049.png) |
+| ![Warning Outline](media/Screenshot%202026-06-11%20234801.png) | ![Safe Text Untouched](media/Screenshot%202026-06-11%20234935.png) | ![Blurred Content Banner](media/Screenshot%202026-06-11%20235049.png) |
 | Borderline text elements are marked with a yellow border and warning icon. | Legitimate and everyday text remains completely untouched. | High-risk trafficking messages are blurred and hidden with a red shield banner. |
 
 ---
@@ -105,6 +105,11 @@ You can verify the live OCR scanning functionality using the generated flyer tes
 │       ├── manifest.json     --> Extension manifest configuration
 │       ├── content_script.js --> Live webpage DOM scanner & styling injector
 │       └── popup.html/js     --> UI popup controller
+│
+├── paper/                    --> Research paper and conversion utility
+│   ├── algospeak..pdf        --> IEEE research paper (PDF)
+│   ├── algospeak.md          --> Decoded paper content (Markdown)
+│   └── pdf_to_md.py          --> PDF to Markdown conversion script
 │
 ├── media/                    --> Directory containing live test screenshots and charts
 │   ├── Screenshot 2026-06-11 234801.png
