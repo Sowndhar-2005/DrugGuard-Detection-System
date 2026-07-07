@@ -1,6 +1,6 @@
 ## Algospeak-Resilient Drug Trafficking Detection Using Semantic Machine Learning and a Real-Time Browser Extension
 
-**Agalya M, Kalaipriya S, Sowndhar A, Er.K.Daniel Raj**
+**Agalya M, Kalaipriya S, Sowndhar A**
 
 *Department of CSE (AI & ML), Kalaignarkarunanidhi Institute of Technology, Coimbatore, India*
 
@@ -162,65 +162,3 @@ This paper presented a real-time, algospeak-resilient drug trafficking detection
 * [9] T. Hayashi and R. Nojima, "Detecting Illicit Drug Trade on SNS through Image Classification and Real-Time Monitoring," *IEEE*, 2024.
 * [10] DEA, "Drug Emoji Slang: Decoded — The Hidden Language of Illicit Drugs," *Lake Point Recovery*, 2025.
 * [11] M. Jahanbakhsh et al., "Real-Time DOM Overlays and User Signalling via Browser Extensions," 2024.
-
----
-
-### IX. SYSTEM IMPLEMENTATION & COMPONENT WALKTHROUGH
-
-This section provides a comprehensive technical walkthrough of the complete DrugGuard codebase, mapping the mathematical formulations described in Section IV to concrete system components.
-
-#### A. Directory Structure and Module Layout
-The repository is split into two major subsystems: the Python-based machine learning backend (`ML-Dome`) and the JavaScript-based Chrome extension (`project/extension`):
-
-```
-.
-├── ML-Dome/                     --> Backend ML Services
-│   ├── app.py                   --> Interactive CLI verification application
-│   ├── dataset.csv              --> Balanced dataset (1,200 samples)
-│   ├── generate_project_plots.py--> Matplotlib script for generating evaluation figures
-│   ├── requirements.txt         --> Python dependencies
-│   ├── server.py                --> FastAPI REST backend server
-│   ├── setup_dataset_v2.py      --> Balanced dataset generator with hard negatives
-│   ├── train_model.py           --> Model trainer (Saves text_model.pkl & vectorizer.pkl)
-│   ├── text_model.pkl           --> Pre-trained Naive Bayes classifier
-│   └── vectorizer.pkl           --> CountVectorizer vocabulary
-│
-├── project/                     --> Chrome Client Extension
-│   └── extension/               --> Source directories
-│       ├── manifest.json        --> Manifest configuration (V3)
-│       ├── background.js        --> Service worker (CORS bypass and proxy fetching)
-│       ├── content_script.js    --> DOM scanner & visual intervention overlays
-│       ├── popup.html           --> Extension dashboard UI
-│       ├── popup.js             --> Dashboard animation and action routing
-│       └── icons/               --> Extension toolbar icons
-```
-
-#### B. Machine Learning Engine & Semantic Normalization
-1. **Model Specifications**: The core text classifier is a Multinomial Naive Bayes model. Naive Bayes classification is well-suited for high-dimensional, low-latency text classifications, matching the real-time requirements of browser content moderation.
-2. **Feature Extraction**: Prior to training, raw text is processed through a semantic normalization layer. Emojis and obfuscated leetspeak patterns are decoded to their canonical names. Emojis such as `🍃` map to `" marijuana "`, `💊` to `" pills "`, and `🔌` to `" plug "`. Characters with leetspeak symbols like `dr*gs` or `x@nax` are mapped back to `"drugs"` and `"xanax"`.
-3. **Training Parameters**:
-   - **Vectorizer**: CountVectorizer using a custom regex token pattern to preserve emojis and words, excluding standard English stopwords.
-   - **Split**: 80% training set (960 samples) and 20% test set (240 samples).
-   - **Score**: The enriched model achieves **98.75% classification accuracy** on the test set, with **0.98 precision** and **1.00 recall** for the drug class.
-
-#### C. FastAPI Backend REST API (`server.py`)
-The server runs on `http://localhost:8000` and serves two main POST endpoints:
-1. **`/predict`**:
-   - **Input**: `{ "text": string }`
-   - **Action**: Applies `normalize_text()` to decode emojis and leetspeak, feeds the text into the vectorizer and model, and returns a risk score from $0.0$ to $1.0$.
-   - **Output**: `{ "action": "safe" | "warn" | "block", "risk_score": float, "confidence": float, "label": int, "triggered_words": list }`
-2. **`/predict_image`**:
-   - **Input**: `{ "image": "data:image/jpeg;base64,..." }`
-   - **Action**: Decodes the base64 string. Checks the MD5 hash of the image against a local database of known illicit drug media (e.g. syringe, marijuana leaf) for instant O(1) blocking. If no hash match is found, runs the `RapidOCR` engine to extract text, normalizes it, and feeds the resulting string to the Naive Bayes classifier.
-   - **Output**: Returns the same JSON prediction response as `/predict`.
-
-#### D. Browser Extension Architecture (Client Layer)
-The extension implements three cooperative scripts to scan web pages in the background:
-1. **`manifest.json`**: Configured under Chrome Manifest V3. Requests permissions for `activeTab`, `scripting`, and `storage` alongside `<all_urls>` host permissions to fetch predictions from the local FastAPI backend.
-2. **`content_script.js`**:
-   - **DOM Observation**: Implements a `MutationObserver` to intercept asynchronously loaded text and infinite-scroll content.
-   - **Leaf Filtering**: Targets leaf-level nodes (`p`, `article`, etc.) to prevent redundant container parsing.
-   - **DOM Styling**: Injects CSS classes to handle visual interventions. Warned elements receive a yellow border (`.drugguard-warn`) and warning icon. High-risk elements receive a CSS blur filter (`.drugguard-block`) and a red overlay banner.
-   - **Event Listener**: Intercepts capture-phase click events. Clicking a blurred element removes the banner and transitions it to a safe state.
-3. **`background.js`**: Coordinates state synchronization, maintains counts, and acts as a CORS bypass proxy by running server-side fetches for remote images that cannot be loaded by the content script due to safety policies.
-4. **`popup.js` / `popup.html`**: Renders the extension's user dashboard, displaying animated counters for scanned, warned, and blocked elements. Provides a toggle switch to enable/disable protection and a **🔄 Rescan** button which resets state and triggers a full DOM scan.

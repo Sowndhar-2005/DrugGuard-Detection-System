@@ -2,9 +2,14 @@
 
 ![DrugGuard Extension Demo](media/extension_preview.png)
 
-Online social platforms and messaging apps are increasingly exploited for illicit drug trafficking. To evade automated moderators, traffickers use a sophisticated linguistic strategy known as **Algospeak**—using emoji codes (e.g., `🍃` for weed, `❄️` for cocaine, `💊` for pills, `🔌` for dealer), leetspeak, intentional typos, and spaced letters. Standard keyword filters are easily bypassed by these methods, creating a pressing need for a system that understands the context and semantics of social media communications in real time.
+Online social platforms and messaging apps are increasingly exploited for illicit drug trafficking. To evade automated moderators, traffickers use a sophisticated linguistic strategy known as **Alg[...]
 
-**DrugGuard** solves this by providing a lightweight, high-performance, and algospeak-resilient browser extension powered by a machine learning backend. It dynamically scans webpage text, performs Optical Character Recognition (OCR) on image advertisements, and intervenes on the user interface (by blurring content or showing warning indicators) in milliseconds.
+**DrugGuard** solves this by providing a lightweight, high-performance, and algospeak-resilient browser extension powered by a machine learning backend. It dynamically scans webpage text, performs [...]
+
+---
+
+## 📄 Paper
+- IEEE paper (PDF): [algospeak..pdf](algospeak..pdf)
 
 ---
 
@@ -14,7 +19,7 @@ Here is the DrugGuard extension running locally and intercepting content on our 
 
 | **1. Detection & Warning Intervention** | **2. Safe Content Allowed** | **3. High-Risk Content Blocked** |
 | :---: | :---: | :---: |
-| ![Warning Outline](media/Screenshot%202026-06-11%20234801.png) | ![Safe Text Untouched](media/Screenshot%202026-06-11%20234935.png) | ![Blurred Content Banner](media/Screenshot%202026-06-11%20235049.png) |
+| ![Warning Outline](algospeak_media/Screenshot%202026-06-11%20234801.png) | ![Safe Text Untouched](algospeak_media/Screenshot%202026-06-11%20234935.png) | ![Blurred Content Banner](algospeak_media/Screenshot%202026-06-11%20235049.png) |
 | Borderline text elements are marked with a yellow border and warning icon. | Legitimate and everyday text remains completely untouched. | High-risk trafficking messages are blurred and hidden with a red shield banner. |
 
 ---
@@ -55,8 +60,8 @@ graph TD
 ## ⚙️ Core Architecture & Features
 
 ### 1. Natural Language Processing (NLP) Backend
-* **Robust Dataset**: Trained on 1,200 rows containing balanced drug trafficking templates, emoji-coded slang, and hard negatives (legitimate news reports, medical pharmacy guidelines, and standard marketplace listings).
-* **Naive Bayes Classifier**: Utilizes `CountVectorizer` paired with a `MultinomialNB` model. The vectorizer is configured to treat emoji characters as valid features alongside alphanumeric tokens, allowing it to mathematically associate emojis like `💊` and `🔌` with trafficking patterns.
+* **Robust Dataset**: Trained on 1,200 rows containing balanced drug trafficking templates, emoji-coded slang, and hard negatives (legitimate news reports, medical pharmacy guidelines, and standar[...]
+* **Naive Bayes Classifier**: Utilizes `CountVectorizer` paired with a `MultinomialNB` model. The vectorizer is configured to treat emoji characters as valid features alongside alphanumeric tokens[...]
 
 ### 2. Live Browser Extension
 * **Content Injection**: A Chrome extension content script that periodically scans the webpage DOM for text elements.
