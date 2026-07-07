@@ -1,14 +1,20 @@
-## Algospeak-Resilient Drug Trafficking Detection Using Semantic Machine Learning and a Real-Time Browser Extension
+<div style="font-family: 'Times New Roman', Times, serif;">
 
-**Agalya M, Kalaipriya S, Sowndhar A**
+<h1 align="center" style="font-size: 24px; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">Algospeak-Resilient Drug Trafficking Detection Using Semantic Machine Learning and a Real-Time Browser Extension</h1>
 
-*Department of CSE (AI & ML), Kalaignarkarunanidhi Institute of Technology, Coimbatore, India*
+<p align="center" style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">Agalya M, Kalaipriya S, Sowndhar A</p>
+<p align="center" style="font-size: 12px; font-style: italic; margin-bottom: 25px;">Department of CSE (AI & ML), Kalaignarkarunanidhi Institute of Technology, Coimbatore, India</p>
 
-**Abstract** – The rapid proliferation of social media platforms has significantly expanded the attack surface for illicit drug trafficking, wherein dealers employ obfuscated communication strategies collectively termed "algospeak"—comprising emojis, abbreviations, leetspeak, and coded terminology—to evade automated moderation systems. Existing detection approaches, primarily reliant on static keyword filtering and post-hoc platform-level analysis, are inadequate for identifying evolving obfuscation patterns or enabling real-time client-side intervention. This paper proposes an algospeak-resilient, multimodal drug trafficking detection system that integrates a Multinomial Naive Bayes machine learning classifier, a RapidOCR-based image text extraction engine, and client-side browser intervention. We introduce a semantic normalization layer to decode emojis, slang, and obfuscated text into structured representations prior to model inference. Normalized text is classified using a Multinomial Naive Bayes model trained with TF-IDF, while visual media is processed via RapidOCR to extract embedded text for downstream semantic classification. A Manifest V3 Chrome extension executes real-time content blurring, blocking, or warning overlays directly on the DOM in under 5 milliseconds for text and 150-300 milliseconds for images. Evaluated on a manually annotated dataset encompassing 1,200 samples of algospeak-heavy text and hard negatives, the proposed system achieves 98.75% classification accuracy with an F1-score of 0.99, demonstrating suitability for real-time user-level safety deployment.
+<div style="margin: 0 40px 25px 40px; font-size: 12px; text-align: justify; line-height: 1.5;">
+<b><i>Abstract</i>— The rapid proliferation of social media platforms has significantly expanded the attack surface for illicit drug trafficking, wherein dealers employ obfuscated communication strategies collectively termed "algospeak"—comprising emojis, abbreviations, leetspeak, and coded terminology—to evade automated moderation systems. Existing detection approaches, primarily reliant on static keyword filtering and post-hoc platform-level analysis, are inadequate for identifying evolving obfuscation patterns or enabling real-time client-side intervention. This paper proposes an algospeak-resilient, multimodal drug trafficking detection system that integrates a Multinomial Naive Bayes machine learning classifier, a RapidOCR-based image text extraction engine, and client-side browser intervention. We introduce a semantic normalization layer to decode emojis, slang, and obfuscated text into structured representations prior to model inference. Normalized text is classified using a Multinomial Naive Bayes model trained with TF-IDF, while visual media is processed via RapidOCR to extract embedded text for downstream semantic classification. A Manifest V3 Chrome extension executes real-time content blurring, blocking, or warning overlays directly on the DOM in under 5 milliseconds for text and 150-300 milliseconds for images. Evaluated on a manually annotated dataset encompassing 1,200 samples of algospeak-heavy text and hard negatives, the proposed system achieves 98.75% classification accuracy with an F1-score of 0.99, demonstrating suitability for real-time user-level safety deployment.</b>
+<br><br>
+<b><i>Keywords</i>— Drug Trafficking Detection, Algospeak, Naive Bayes, RapidOCR, Chrome Extension, Real-Time Intervention, Content Moderation.</b>
+</div>
 
-*Keywords — Drug Trafficking Detection, Algospeak, Naive Bayes, RapidOCR, Chrome Extension, Real-Time Intervention, Content Moderation.*
+<hr style="border: 0.5px solid #ccc; margin-bottom: 25px;">
 
----
+<div style="column-count: 2; column-gap: 30px; text-align: justify; font-size: 13px; line-height: 1.6;">
+
 
 ### I. INTRODUCTION
 
@@ -33,9 +39,7 @@ Recent advances in natural language processing have enabled the application of m
 The emergence of algospeak has introduced a distinct challenge for content moderation systems. Traffickers systematically employ emojis, phonetic abbreviations, and intentionally obfuscated spellings to bypass automated filters [11]. Song et al. [3] proposed the JEDIS framework, which applies delexicalized distant supervision to identify latent drug-related terminology in informal online conversations. By combining contextual token embeddings with word-attribute-level analysis, JEDIS demonstrates effective generalization to previously unseen slang on platforms such as Reddit. However, these models do not incorporate explicit preprocessing layers that convert emojis and slang into structured token sequences prior to model inference.
 
 #### C. Multimodal Detection and Browser Intervention
-Drug trafficking content frequently combines textual and visual elements, including images of controlled substances, packaging, or flyers. To exploit this, multimodal learning frameworks have been proposed that jointly process text and image inputs. Despite these advances, existing multimodal systems are predominantly designed for offline platform-level analysis and have not been optimized for low-latency, real-time deployment. Browser extensions have been explored as a complementary mechanism for real-time content modification at the client side, leveraging Document Object Model (DOM) monitoring to dynamically alter or suppress webpage content as it is rendered [12]. However, existing browser-based approaches are predominantly rule-based and lack integration with learned semantic models. The present work addresses this gap.
-
----
+Drug trafficking content frequently combines textual and visual elements, including images of controlled substances, packaging, or flyers. To exploit this, multimodal learning frameworks have been proposed that jointly process text and image inputs. Despite these advances, existing multimodal systems are predominantly designed for offline platform-level analysis and have not been optimized for low-latency, real-time deployment. Browser extensions have been explored as a complementary mechanism for real-time content modification at the client side, leveraging Document Object Model (DOM) monitoring to dynamically alter or suppress webpage content as it is rendered [12]. However, eExisting browser-based approaches are predominantly rule-based and lack integration with learned semantic models. The present work addresses this gap.
 
 ### III. SYSTEM ARCHITECTURE
 
@@ -47,7 +51,11 @@ The proposed system adopts a client-server architecture designed to detect and s
 
 The comprehensive system structure and component interactions are depicted in the architectural diagram in Fig. 1.
 
+<div style="column-span: all; text-align: center; margin: 20px 0;">
+
 ![Fig. 1: Architectural Diagram](../media/img_0001.png)
+
+</div>
 
 #### B. Browser Extension (Client Layer)
 The browser extension is implemented using the Chrome Extension Manifest V3 API and serves as the interface between the user's browsing session and the detection backend. A `MutationObserver` instance is registered against the DOM to continuously monitor structural changes, enabling detection of dynamically loaded content such as infinite-scroll posts and asynchronously rendered comments without requiring page reloads.
@@ -58,8 +66,6 @@ The backend server is implemented using the FastAPI framework in Python. The bac
 #### D. Semantic Preprocessing and OCR Layer
 Visual inputs (flyers, ad images) are processed on the backend using `RapidOCR`. The engine extracts embedded text from the image and forwards it to the semantic preprocessing pipeline. The text goes through a normalization layer where emojis are mapped to text (e.g., `🍃` becomes "marijuana"), slang is decoded, and leetspeak character obfuscation is corrected. The normalized string is then passed to the Naive Bayes classifier.
 
----
-
 ### IV. METHODOLOGY
 
 #### A. Input Preprocessing and Vectorization
@@ -67,7 +73,11 @@ Let the input text be denoted as $T_{raw}$. The normalized representation $T_{no
 $$T_{norm} = f_{norm}(T_{raw})$$
 where $f_{norm}(\cdot)$ represents the composite normalization function mapping emojis, slang, and leetspeak to canonical tokens. The detailed stages of this preprocessing pipeline are illustrated in Fig. 2.
 
+<div style="column-span: all; text-align: center; margin: 20px 0;">
+
 ![Fig. 2: Semantic Normalization](../media/img_0002.jpeg)
+
+</div>
 
 The normalized text is converted into a numerical feature vector $X$ using a Bag of Words `CountVectorizer` configured to support emoji character patterns:
 $$X = \text{CountVectorizer}(T_{norm})$$
@@ -80,7 +90,11 @@ $$S = P(c=1 | X)$$
 
 The integration of visual OCR text with direct semantic classification represents the core multimodal fusion strategy, shown in Fig. 3.
 
+<div style="column-span: all; text-align: center; margin: 20px 0;">
+
 ![Fig. 3: Multimodal Fusion Strategy](../media/img_0003.jpeg)
+
+</div>
 
 #### C. Decision Policy and UI Intervention
 The computed risk score $S$ drives client-side UI modifications based on the following threshold policy:
@@ -88,14 +102,16 @@ The computed risk score $S$ drives client-side UI modifications based on the fol
 * **$0.4 \le S < 0.7$**: Borderline Content — The extension applies a yellow warning border and warning icon overlay to the text block.
 * **$S \ge 0.7$**: High-Risk Content — The text block or image is immediately blurred (`filter: blur(8px)`), and a red banner overlay ("Content Blocked — Click to reveal") is injected. Clicks on the banner are intercepted via a capture-phase listener to remove the blur.
 
----
-
 ### V. DATASET AND TRAINING
 
 #### A. Dataset Description
 The system is trained and evaluated using a dataset designed to capture both explicit and algospeak-encoded drug-related content. The composition of the training data categories is shown in Fig. 4.
 
+<div style="column-span: all; text-align: center; margin: 20px 0;">
+
 ![Fig. 4: Dataset Composition](../media/img_0004.jpeg)
+
+</div>
 
 * **Positive-Class Samples**: Text containing direct trafficking terms and emoji-coded slang.
 * **Negative-Class Samples (Hard Negatives)**: Safe sentences that contain drug-adjacent terms (e.g. news reports of drug busts, legitimate medical prescriptions, and standard delivery listings) to train the model on context.
@@ -103,14 +119,18 @@ The system is trained and evaluated using a dataset designed to capture both exp
 #### B. Data Splitting
 The dataset consists of 1,200 samples and is partitioned using stratified sampling to preserve class distribution across splits: Training Set (70%), Validation Set (15%), and Test Set (15%), as shown in Fig. 5.
 
+<div style="column-span: all; text-align: center; margin: 20px 0;">
+
 ![Fig. 5: Dataset Split Distribution](../media/img_0005.jpeg)
 
----
+</div>
 
 ### VI. RESULTS AND EVALUATION
 
 #### A. Quantitative Results
 The system was evaluated on a test split of 1,200 rows. Table I details the results.
+
+<div style="column-span: all; margin: 20px auto; max-width: 90%;">
 
 | Model Modality | Accuracy | Precision | Recall | F1-Score |
 | :--- | :---: | :---: | :---: | :---: |
@@ -119,9 +139,16 @@ The system was evaluated on a test split of 1,200 rows. Table I details the resu
 | **Multinomial Naive Bayes (Text Only)** | **98.75%** | **0.98** | **1.00** | **0.99** |
 | **RapidOCR + Naive Bayes (Multimodal)** | **98.75%** | **0.98** | **1.00** | **0.99** |
 
+<p style="font-size: 11px; text-align: center; font-style: italic; margin-top: 5px;">TABLE I: Quantitative Comparison of Detection Models</p>
+</div>
+
 The substantial impact of applying the semantic normalization layer to decode emojis and slang prior to vectorization is quantified via the ablation study in Fig. 6.
 
+<div style="column-span: all; text-align: center; margin: 20px 0;">
+
 ![Fig. 6: Effect of Semantic Normalization](../media/img_0006.jpeg)
+
+</div>
 
 #### B. Real-Time Performance and Latency
 The processing pipeline timings are illustrated in the end-to-end inference latency breakdown in Fig. 7:
@@ -129,25 +156,29 @@ The processing pipeline timings are illustrated in the end-to-end inference late
 - **Image OCR and Extraction**: **150 ms – 300 ms** (using RapidOCR).
 - **End-to-End Latency**: **250 ms – 300 ms** (including network round-trip).
 
+<div style="column-span: all; text-align: center; margin: 20px 0;">
+
 ![Fig. 7: End-to-End Inference Latency Breakdown](../media/img_0007.jpeg)
+
+</div>
 
 This extremely low latency ensures that content is blurred or flagged before the user is able to read the illicit advertisement.
 
 #### C. Live Intervention Case Studies
 The Chrome extension was tested on local sandboxes to evaluate the three UI states. The visual results are shown below in Fig. 8:
 
+<div style="column-span: all; margin: 20px auto;">
+
 | **Fig. 8.1: Borderline Content (Warned)** | **Fig. 8.2: Safe Content (Allowed)** | **Fig. 8.3: High-Risk Content (Blocked)** |
 | :---: | :---: | :---: |
 | ![Warning Outline](../media/Screenshot%202026-06-11%20234801.png) | ![Safe Text Untouched](../media/Screenshot%202026-06-11%20234935.png) | ![Blurred Content Banner](../media/Screenshot%202026-06-11%20235049.png) |
 | Borderline text elements are marked with a yellow border and warning icon. | Legitimate and everyday text remains completely untouched. | High-risk trafficking messages are blurred and hidden with a red shield banner. |
 
----
+</div>
 
 ### VII. CONCLUSION
 
 This paper presented a real-time, algospeak-resilient drug trafficking detection system that integrates a Multinomial Naive Bayes classifier, a RapidOCR image extraction backend, and a Manifest V3 Chrome extension. By using a semantic normalization layer to map emojis, slang, and leetspeak prior to inference, the text classifier achieves a 98.75% accuracy score on algospeak-heavy test cases. The client-side extension dynamically alters webpage DOM elements in under 5 ms for text, providing immediate protection. Future work will explore expanding the normalization dictionary dynamically through community-driven feedback loops and expanding visual classification to detect substance categories directly.
-
----
 
 ### VIII. REFERENCES
 
@@ -162,3 +193,7 @@ This paper presented a real-time, algospeak-resilient drug trafficking detection
 * [9] T. Hayashi and R. Nojima, "Detecting Illicit Drug Trade on SNS through Image Classification and Real-Time Monitoring," *IEEE*, 2024.
 * [10] DEA, "Drug Emoji Slang: Decoded — The Hidden Language of Illicit Drugs," *Lake Point Recovery*, 2025.
 * [11] M. Jahanbakhsh et al., "Real-Time DOM Overlays and User Signalling via Browser Extensions," 2024.
+
+</div>
+
+</div>
