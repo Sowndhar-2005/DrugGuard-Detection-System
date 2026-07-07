@@ -82,6 +82,42 @@ class PredictResponse(BaseModel):
     label: int           # 0 = safe, 1 = drug
     triggered_words: list[str]  # top words that caused the prediction
 
+def normalize_text(text: str) -> str:
+    """
+    Standardizes input text by mapping emojis to semantic text equivalents,
+    and correcting simple leetspeak obfuscations (e.g. d*ugs -> drugs).
+    """
+    emoji_map = {
+        "🍃": " marijuana ",
+        "🌿": " marijuana ",
+        "❄️": " cocaine ",
+        "💊": " pills ",
+        "🔌": " plug ",
+        "🍄": " mushrooms ",
+        "💉": " heroin ",
+        "📦": " package ",
+        "💰": " cash ",
+    }
+    for emoji, replacement in emoji_map.items():
+        text = text.replace(emoji, replacement)
+        
+    leetspeak_map = {
+        "dr*gs": "drugs",
+        "dr*g": "drug",
+        "d r u g s": "drugs",
+        "d r u g": "drug",
+        "x*nax": "xanax",
+        "x@nax": "xanax",
+        "c*caine": "cocaine",
+        "h*roin": "heroin",
+        "f*ntanyl": "fentanyl",
+    }
+    for pattern, replacement in leetspeak_map.items():
+        text = text.replace(pattern, replacement)
+        
+    return text
+
+
 # ─── Helper: Find Triggered Words ────────────────────────────────────────────
 
 def get_triggered_words(text: str, top_n: int = 3) -> list[str]:
@@ -148,8 +184,11 @@ def predict(request: PredictRequest):
     if not text:
         raise HTTPException(status_code=400, detail="Text cannot be empty.")
 
+    # Normalize text (emojis and leetspeak)
+    normalized_text = normalize_text(text)
+
     # Vectorize (lowercase, bag-of-words — matches training preprocessing)
-    text_vec = vectorizer.transform([text.lower()])
+    text_vec = vectorizer.transform([normalized_text.lower()])
 
     # Predict class and probability
     label = int(model.predict(text_vec)[0])
@@ -160,7 +199,7 @@ def predict(request: PredictRequest):
     confidence = round(risk_score * 100, 2)
 
     # Find words that triggered the drug prediction
-    triggered_words = get_triggered_words(text) if label == 1 else []
+    triggered_words = get_triggered_words(normalized_text) if label == 1 else []
 
     # Map score to browser intervention action
     action = score_to_action(risk_score)
@@ -238,13 +277,16 @@ def predict_image(request: PredictImageRequest):
             triggered_words=[],
         )
     
+    # Normalize text (emojis and leetspeak)
+    normalized_text = normalize_text(extracted_text)
+
     # Run prediction using the same logic as /predict
-    text_vec = vectorizer.transform([extracted_text.lower()])
+    text_vec = vectorizer.transform([normalized_text.lower()])
     label = int(model.predict(text_vec)[0])
     probabilities = model.predict_proba(text_vec)[0]
     risk_score = float(probabilities[1])
     confidence = round(risk_score * 100, 2)
-    triggered_words = get_triggered_words(extracted_text) if label == 1 else []
+    triggered_words = get_triggered_words(normalized_text) if label == 1 else []
     action = score_to_action(risk_score)
     
     # For debugging, we can log the extracted text

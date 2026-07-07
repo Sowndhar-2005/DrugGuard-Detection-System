@@ -1,6 +1,6 @@
 # 🛡️ DrugGuard: Algospeak-Resilient Semantic Detection of Illicit Drug Content
 
-![DrugGuard Extension Demo](extension_preview.png)
+![DrugGuard Extension Demo](media/extension_preview.png)
 
 Online social platforms and messaging apps are increasingly exploited for illicit drug trafficking. To evade automated moderators, traffickers use a sophisticated linguistic strategy known as **Algospeak**—using emoji codes (e.g., `🍃` for weed, `❄️` for cocaine, `💊` for pills, `🔌` for dealer), leetspeak, intentional typos, and spaced letters. Standard keyword filters are easily bypassed by these methods, creating a pressing need for a system that understands the context and semantics of social media communications in real time.
 
@@ -14,7 +14,7 @@ Here is the DrugGuard extension running locally and intercepting content on our 
 
 | **1. Detection & Warning Intervention** | **2. Safe Content Allowed** | **3. High-Risk Content Blocked** |
 | :---: | :---: | :---: |
-| ![Warning Outline](algospeak_media/Screenshot%202026-06-11%20234801.png) | ![Safe Text Untouched](algospeak_media/Screenshot%202026-06-11%20234935.png) | ![Blurred Content Banner](algospeak_media/Screenshot%202026-06-11%20235049.png) |
+| ![Warning Outline](media/Screenshot%202026-06-11%20234801.png) | ![Safe Text Untouched](media/Screenshot%202026-06-11%20234935.png) | ![Blurred Content Banner](media/Screenshot%202026-06-11%20235049.png) |
 | Borderline text elements are marked with a yellow border and warning icon. | Legitimate and everyday text remains completely untouched. | High-risk trafficking messages are blurred and hidden with a red shield banner. |
 
 ---
@@ -101,7 +101,7 @@ You can verify the live OCR scanning functionality using the generated flyer tes
 │       ├── content_script.js --> Live webpage DOM scanner & styling injector
 │       └── popup.html/js     --> UI popup controller
 │
-├── algospeak_media/          --> Directory containing live test screenshots
+├── media/                    --> Directory containing live test screenshots and charts
 │   ├── Screenshot 2026-06-11 234801.png
 │   ├── Screenshot 2026-06-11 234935.png
 │   └── Screenshot 2026-06-11 235049.png
