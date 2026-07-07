@@ -1,6 +1,6 @@
 ## Algospeak-Resilient Drug Trafficking Detection Using Semantic Machine Learning and a Real-Time Browser Extension
 
-**Agalya M, Kalaipriya S, Sowndhar A, Er.K.Daniel Raj**
+**Agalya M, Kalaipriya S, Sowndhar A**
 
 *Department of CSE (AI & ML), Kalaignarkarunanidhi Institute of Technology, Coimbatore, India*
 
