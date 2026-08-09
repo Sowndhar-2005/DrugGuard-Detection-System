@@ -6,18 +6,11 @@
 </p>
 
 <p align="center">
-  <img src="assets/logo.svg" alt="DrugGuard Logo" width="120"/><br/>
-  <h1 align="center">🛡️ DrugGuard Detection System</h1>
-  <p align="center"><strong>Algospeak-Resilient Multimodal Drug Trafficking Detection & Real-Time Intervention</strong></p>
-</p>
-
-<p align="center">
-  <a href="paper/algospeak_paper.pdf"><img src="https://img.shields.io/badge/IEEE%20Paper-PDF%20Format-red?style=for-the-badge&logo=adobeacrobatreader" alt="IEEE Paper PDF"/></a>
-  <a href="paper/algospeak.md"><img src="https://img.shields.io/badge/IEEE%20Paper-Markdown%20Format-blue?style=for-the-badge&logo=markdown" alt="IEEE Paper MD"/></a>
   <a href="test_page.html"><img src="https://img.shields.io/badge/Test%20Suite-test__page.html-orange?style=for-the-badge&logo=html5" alt="Test Page"/></a>
   <a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi" alt="FastAPI"/></a>
   <a href="https://onnxruntime.ai/"><img src="https://img.shields.io/badge/ML%20Inference-ONNX%20Runtime-blueviolet?style=for-the-badge&logo=onnx" alt="ONNX Runtime"/></a>
   <a href="https://developer.chrome.com/docs/extensions/mv3/intro/"><img src="https://img.shields.io/badge/Chrome%20Extension-Manifest%20V3-4285F4?style=for-the-badge&logo=googlechrome" alt="Manifest V3"/></a>
+  <a href="paper/algospeak_paper.pdf"><img src="https://img.shields.io/badge/IEEE%20Paper-PDF%20Format-red?style=for-the-badge&logo=adobeacrobatreader" alt="IEEE Paper PDF"/></a>
 </p>
 
 **Real-time client-side intervention system combining NLP Algospeak resilience, Computer Vision, and Chrome Extension DOM moderation.**
@@ -95,38 +88,56 @@ $$\text{Risk Score} = w_t \cdot S_{text} + w_v \cdot S_{vision}$$
 </p>
 <p align="center"><em>Figure 3: Multimodal Fusion Engine integrating NLP and Vision prediction vectors.</em></p>
 
-- **High Risk ($\ge 0.70$ or explicit drug match)**: Triggers **BLOCK** action.
-- **Medium Risk ($0.35 - 0.69$)**: Triggers **WARN** action.
-- **Low Risk ($< 0.35$)**: Allows content as **SAFE**.
+---
 
-### 5. Client-Side Browser Intervention (Chrome Extension v4.0)
-- **Non-intrusive DOM Blurring**: High-risk posts and illicit images are automatically blurred with heavy CSS filter (`blur(16px)`).
-- **Top-Bar Action Banners**: Displays a sleek red top banner (`🛡️ Blocked: Coded drug content detected`) with a prominent **REVEAL** button.
-- **Red Highlight on Reveal**: Clicking **REVEAL** un-blurs the content and highlights dangerous text in a distinct red left border and light red background.
-- **Warning Highlight**: Medium-risk content is highlighted with a yellow background and border (no blur) with a **DISMISS** button.
+## 📷 Extension Visual Interventions: Block vs. Warning State Comparison
+
+The DrugGuard browser extension implements a dynamic dual-tiered intervention model based on calculated risk scores:
+
+| Intervention Tier | Risk Score Threshold | DOM Visual Action | User Control Option |
+|---|---|---|---|
+| 🚨 **BLOCK (High Risk)** | Composite Risk $\ge 0.70$ | Heavy CSS Blur (`blur(16px)`) + Red Top Banner (`🛡️ Blocked`) | **REVEAL** button (removes blur & highlights text in red) |
+| ⚠️ **WARN (Medium Risk)** | $0.35 \le$ Composite Risk $< 0.70$ | Yellow Background Highlight + Yellow Border (**No Blur**) | **DISMISS** button (removes yellow highlight) |
+| ✅ **SAFE (Low Risk)** | Composite Risk $< 0.35$ | Content rendered normally without modification | None required |
+
+### Visual Comparison
+
+<table align="center" border="0" style="width: 100%; border-collapse: collapse;">
+  <tr>
+    <td align="center" style="width: 50%; vertical-align: top; padding: 10px;">
+      <h4>🚨 High-Risk Block State (Content Blurred)</h4>
+      <img src="assets/Block.png" alt="High Risk Block Intervention Screenshot" width="100%" style="border-radius: 8px; border: 1px solid #ef4444;"/>
+      <p style="font-size: 11px; color: #64748b; margin-top: 6px;"><em>Heavy blur applied to text and image content. Top red banner displays identified algospeak keywords and REVEAL button.</em></p>
+    </td>
+    <td align="center" style="width: 50%; vertical-align: top; padding: 10px;">
+      <h4>⚠️ Medium-Risk Warning State (Highlighted, Readable)</h4>
+      <img src="assets/warning.png" alt="Medium Risk Warning Intervention Screenshot" width="100%" style="border-radius: 8px; border: 1px solid #f59e0b;"/>
+      <p style="font-size: 11px; color: #64748b; margin-top: 6px;"><em>Soft yellow background highlight and border. Content remains 100% readable with a DISMISS button to clear warning.</em></p>
+    </td>
+  </tr>
+</table>
 
 ---
 
-## 📷 Extension Visual Demo & Control Panel
+## 🎛️ Extension Control Panel & Popup UI
+
+The DrugGuard extension features an intuitive control panel accessible directly from the browser toolbar, allowing users to monitor session activity and customize moderation sensitivity.
 
 <p align="center">
-  <img src="assets/extension_test_screenshot.png" alt="DrugGuard Extension Real-Time DOM Moderation Demo" width="850"/>
+  <img src="assets/pop_up_ui.png" alt="DrugGuard Chrome Extension Control Panel Popup UI" width="380" style="border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);"/>
 </p>
-<p align="center"><em>Figure 4: DrugGuard Chrome Extension v4.0 operating live on webpage DOM with real-time blur, top intervention banner, and stats panel.</em></p>
+<p align="center"><em>Figure 4: DrugGuard v4.0 Control Panel Popup UI with real-time statistics and sensitivity slider.</em></p>
 
-<p align="center">
-  <img src="assets/extension_ui_dashboard.png" alt="DrugGuard Extension Control Panel Dashboard" width="400"/>
-</p>
-<p align="center"><em>Figure 5: DrugGuard v4.0 Control Panel Popup UI with live session analytics and sensitivity controls.</em></p>
+### Key Popup Features:
 
----
-
-## 📊 Performance & Latency Metrics
-
-<p align="center">
-  <img src="assets/end-to-end_processing_latency_breakdown.jpeg" alt="Processing Latency Breakdown" width="700"/>
-</p>
-<p align="center"><em>Figure 6: End-to-End Processing Latency Breakdown demonstrating sub-300 ms real-time performance.</em></p>
+1. 🟢 **Active Protection Master Toggle**: Real-time switch to enable or pause client-side DOM extraction and intervention across active browser tabs.
+2. 📊 **Live Session Analytics Dashboard**:
+   - 📝 **Texts Scanned**: Tracks total text blocks evaluated during the active browser session.
+   - 🖼️ **Images Scanned**: Tracks total visual image assets processed by MobileNetV2.
+   - 🚫 **Blocked**: Counts high-risk drug trafficking posts blocked and blurred.
+   - ⚠️ **Warned**: Counts medium-risk borderline prescription queries flagged.
+3. 🎚️ **Block Sensitivity Threshold Slider**: Adjustable risk score threshold ($0.10 - 0.90$) enabling users to customize moderation strictness (Lenient vs. Strict).
+4. 🔄 **Rescan Page Button**: Triggers instant DOM re-scanning on the current active webpage tab.
 
 ---
 
@@ -137,12 +148,15 @@ DrugGuard-Detection-System/
 ├── assets/                                                # Visual Assets & System Diagrams
 │   ├── logo.svg                                           # Vector Shield Logo
 │   ├── banner.svg                                         # GitHub Repository Header Banner
+│   ├── Block.png                                          # High-Risk Block State Screenshot
+│   ├── warning.png                                        # Medium-Risk Warning State Screenshot
+│   ├── pop_up_ui.png                                      # Extension Popup Dashboard Screenshot
 │   ├── architectural_diagram.png                          # System Architectural Diagram
 │   ├── semantic_normalization.png                        # Semantic Normalization Pipeline Diagram
 │   ├── multimodal_fusion.png                              # Multimodal Fusion Strategy Diagram
 │   ├── end-to-end_processing_latency_breakdown.jpeg       # Processing Latency Benchmark
 │   ├── extension_test_screenshot.png                      # Extension Live DOM Intervention Screenshot
-│   └── extension_ui_dashboard.png                         # Extension Popup Control Panel Dashboard
+│   └── extension_ui_dashboard.png                         # Extension Control Panel Dashboard
 ├── backend/                                               # FastAPI REST Server & ML Pipeline
 │   ├── server.py                                          # Inference API server with ONNX engine
 │   ├── copy_assets.py                                     # Assets synchronization script
@@ -181,7 +195,7 @@ python server.py
 3. Click **Load unpacked** and select the `extension/` directory.
 
 ### 3. Run Test Suite
-Open `test_page.html` in Chrome (`http://127.0.0.1:5500/test_page.html`) to verify real-time text algospeak detection, vision recognition, warning highlights, and reveal overlays.
+Open [`test_page.html`](file:///d:/Project/DrugGuard-Detection-System/test_page.html) (or `http://127.0.0.1:5500/test_page.html`) in Chrome to test live interventions!
 
 ---
 
@@ -197,8 +211,9 @@ This project is backed by IEEE-formatted research paper:
 ### 🔗 Direct Access Paper Formats & Files:
 * 📖 **IEEE Paper (Markdown)**: [`paper/algospeak.md`](file:///d:/Project/DrugGuard-Detection-System/paper/algospeak.md)
 * 📄 **IEEE Paper (PDF)**: [`paper/algospeak_paper.pdf`](file:///d:/Project/DrugGuard-Detection-System/paper/algospeak_paper.pdf)
+* 🧪 **Interactive Test Page**: [`test_page.html`](file:///d:/Project/DrugGuard-Detection-System/test_page.html)
 
-### 📊 Benchmark Accuracy Comparison:
+### 📊 Benchmark Performance:
 | Model Architecture | Accuracy | F1-Score | Precision | Recall | Avg Latency |
 |---|---|---|---|---|---|
 | TF-IDF + Logistic Regression (Text) | 88.4% | 0.86 | 0.87 | 0.85 | 120 ms |
