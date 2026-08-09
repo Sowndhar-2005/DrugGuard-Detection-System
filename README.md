@@ -26,7 +26,7 @@ DrugGuard solves this with a **hybrid multimodal detection architecture** operat
 ### 🖼️ System Architectural Diagram
 
 <p align="center">
-  <img src="assets/architectural_diagram.png" alt="DrugGuard System Architectural Diagram" width="850"/>
+  <img src="paper/image/paper_image/Architectural%20Diagram.png" alt="DrugGuard System Architectural Diagram" width="850"/>
 </p>
 <p align="center"><em>Figure 1: Full System Architectural Diagram detailing raw content ingestion, semantic normalization, dual ML classifiers, multimodal fusion engine, and Chrome Extension DOM intervention.</em></p>
 
@@ -65,7 +65,7 @@ Before machine learning classification, raw text passes through a deterministic 
 - **Slang Jargon Translation**: Normalizes underground trade jargon into standard vocabulary for transformer processing.
 
 <p align="center">
-  <img src="assets/semantic_normalization.png" alt="Semantic Normalization Architecture" width="750"/>
+  <img src="paper/image/paper_image/Semantic%20Normalization.png" alt="Semantic Normalization Architecture" width="750"/>
 </p>
 <p align="center"><em>Figure 2: Semantic Normalization Pipeline transforming emojis, leetspeak, and slang into structured token sequences.</em></p>
 
@@ -84,7 +84,7 @@ Integrates text and image probability scores via a weighted decision algorithm:
 $$\text{Risk Score} = w_t \cdot S_{text} + w_v \cdot S_{vision}$$
 
 <p align="center">
-  <img src="assets/multimodal_fusion.png" alt="Multimodal Fusion Strategy" width="750"/>
+  <img src="paper/image/paper_image/Multimodal%20Fusion%20Strategy.png" alt="Multimodal Fusion Strategy" width="750"/>
 </p>
 <p align="center"><em>Figure 3: Multimodal Fusion Engine integrating NLP and Vision prediction vectors.</em></p>
 
@@ -111,7 +111,7 @@ The DrugGuard browser extension implements a dynamic dual-tiered intervention mo
     </td>
     <td align="center" style="width: 50%; vertical-align: top; padding: 10px;">
       <h4>⚠️ Medium-Risk Warning State (Highlighted, Readable)</h4>
-      <img src="assets/warning.png" alt="Medium Risk Warning Intervention Screenshot" width="100%" style="border-radius: 8px; border: 1px solid #f59e0b;"/>
+      <img src="assets/warning%20.png" alt="Medium Risk Warning Intervention Screenshot" width="100%" style="border-radius: 8px; border: 1px solid #f59e0b;"/>
       <p style="font-size: 11px; color: #64748b; margin-top: 6px;"><em>Soft yellow background highlight and border. Content remains 100% readable with a DISMISS button to clear warning.</em></p>
     </td>
   </tr>
@@ -145,34 +145,27 @@ The DrugGuard extension features an intuitive control panel accessible directly 
 
 ```
 DrugGuard-Detection-System/
-├── assets/                                                # Visual Assets & System Diagrams
+├── assets/                                                # Visual Assets & Interface Screenshots
 │   ├── logo.svg                                           # Vector Shield Logo
 │   ├── banner.svg                                         # GitHub Repository Header Banner
 │   ├── Block.png                                          # High-Risk Block State Screenshot
-│   ├── warning.png                                        # Medium-Risk Warning State Screenshot
-│   ├── pop_up_ui.png                                      # Extension Popup Dashboard Screenshot
-│   ├── architectural_diagram.png                          # System Architectural Diagram
-│   ├── semantic_normalization.png                        # Semantic Normalization Pipeline Diagram
-│   ├── multimodal_fusion.png                              # Multimodal Fusion Strategy Diagram
-│   ├── end-to-end_processing_latency_breakdown.jpeg       # Processing Latency Benchmark
-│   ├── extension_test_screenshot.png                      # Extension Live DOM Intervention Screenshot
-│   └── extension_ui_dashboard.png                         # Extension Control Panel Dashboard
+│   ├── warning .png                                       # Medium-Risk Warning State Screenshot
+│   └── pop_up_ui.png                                      # Extension Popup Dashboard Screenshot
 ├── backend/                                               # FastAPI REST Server & ML Pipeline
 │   ├── server.py                                          # Inference API server with ONNX engine
-│   ├── copy_assets.py                                     # Assets synchronization script
 │   └── requirements.txt                                   # Python dependencies
 ├── extension/                                             # Chrome Extension Manifest V3 (v4.0.0)
 │   ├── content_script.js                                  # DOM scraper & intervention engine (v4.0)
 │   ├── popup.html                                         # Extension control panel dashboard
 │   ├── popup.js                                           # Threshold & toggle logic
 │   └── manifest.json                                      # Manifest V3 config
-├── paper/                                                 # IEEE Academic Research Paper & PDF
+├── paper/                                                 # IEEE Academic Research Paper & Figures
 │   ├── algospeak.md                                       # Full IEEE Research Paper (Markdown)
-│   └── algospeak_paper.pdf                                # IEEE Research Paper Document (PDF)
-├── train/                                                 # Fine-Tuned ONNX & ML Model Weights
-│   ├── text_model.onnx                                    # DistilBERT ONNX Transformer
-│   ├── image_model.onnx                                   # MobileNetV2 ONNX Vision Classifier
-│   └── image_classes.json                                 # Class mapping index
+│   ├── algospeak_paper.pdf                                # IEEE Research Paper Document (PDF)
+│   └── image/paper_image/                                 # Architectural & Multimodal Flowchart Diagrams
+│       ├── Architectural Diagram.png                      # System Architectural Diagram
+│       ├── Semantic Normalization.png                    # Semantic Normalization Pipeline Diagram
+│       └── Multimodal Fusion Strategy.png                 # Multimodal Fusion Strategy Diagram
 ├── test_page.html                                         # End-to-End Verification Test Webpage
 └── README.md                                              # Project Documentation
 ```
