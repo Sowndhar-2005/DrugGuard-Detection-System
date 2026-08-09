@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "DrugGuard Protection System",
+  "version": "4.0.0",
+  "description": "Protects users by scanning web content (text & images) for drug trafficking and harmful content, using local ML models.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "scripting",
+    "tabs"
+  ],
+
+  "host_permissions": [
+    "http://localhost:8000/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content_script.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

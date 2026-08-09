@@ -1,154 +1,195 @@
-# 🛡️ DrugGuard: Algospeak-Resilient Semantic Detection of Illicit Drug Content
+# 🛡️ DrugGuard: Algospeak-Resilient Multimodal Drug Trafficking Detection System
 
-![DrugGuard Extension Demo](media/extension_preview.png)
+<!-- DrugGuard Banner -->
+<p align="center">
+  <h1 align="center">🛡️ DrugGuard Detection System</h1>
+  <p align="center"><strong>Algospeak-Resilient Multimodal Drug Trafficking Detection & Real-Time Intervention</strong></p>
+</p>
 
-Online social platforms and messaging apps are increasingly exploited for illicit drug trafficking. To evade automated moderators, traffickers use a sophisticated linguistic strategy known as **Alg[...]
+[![IEEE Paper PDF](https://img.shields.io/badge/IEEE%20Paper-PDF%20Format-red?style=for-the-badge&logo=adobeacrobatreader)](file:///d:/Project/DrugGuard-Detection-System/paper/algospeak_paper.pdf)
+[![IEEE Paper MD](https://img.shields.io/badge/IEEE%20Paper-Markdown%20Format-blue?style=for-the-badge&logo=markdown)](file:///d:/Project/DrugGuard-Detection-System/paper/algospeak.md)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-brightgreen?style=for-the-badge&logo=python)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
+[![ONNX Runtime](https://img.shields.io/badge/ML%20Inference-ONNX%20Runtime-blueviolet?style=for-the-badge&logo=onnx)](https://onnxruntime.ai/)
+[![Manifest V3](https://img.shields.io/badge/Chrome%20Extension-Manifest%20V3-4285F4?style=for-the-badge&logo=googlechrome)](https://developer.chrome.com/docs/extensions/mv3/intro/)
 
-**DrugGuard** solves this by providing a lightweight, high-performance, and algospeak-resilient browser extension powered by a machine learning backend. It dynamically scans webpage text, performs [...]
-
----
-
-## 📄 Paper
-- IEEE paper: [algospeak..pdf](paper/algospeak..pdf) and [algospeak.md](paper/algospeak.md)
-
----
-
-## 📷 Live Extension Screenshots & Sandbox Results
-
-Here is the DrugGuard extension running locally and intercepting content on our custom test sandboxes:
-
-| **1. Detection & Warning Intervention** | **2. Safe Content Allowed** | **3. High-Risk Content Blocked** |
-| :---: | :---: | :---: |
-| ![Warning Outline](media/Screenshot%202026-06-11%20234801.png) | ![Safe Text Untouched](media/Screenshot%202026-06-11%20234935.png) | ![Blurred Content Banner](media/Screenshot%202026-06-11%20235049.png) |
-| Borderline text elements are marked with a yellow border and warning icon. | Legitimate and everyday text remains completely untouched. | High-risk trafficking messages are blurred and hidden with a red shield banner. |
+**Real-time client-side intervention system combining NLP Algospeak resilience, Computer Vision, and Chrome Extension DOM moderation.**
 
 ---
 
-## ⚡ Performance, Scanning Speed & Latency Comparison
+## 📌 System Overview & Methodology
 
-A primary engineering constraint was ensuring that web content scanning does not degrade browser rendering performance. The system achieves sub-millisecond latencies for real-time protection.
+**DrugGuard** addresses the rapid growth of illicit drug trafficking on social media platforms, where sellers use evasive communication tactics—collectively known as **algospeak** (emojis like ❄️🍃💊, leetspeak, intentional misspellings like `x*nax`, `p1lls`, and coded jargon). Conventional keyword moderation filters fail against these obfuscation techniques, and platform-level moderation is often post-hoc (reactive).
 
-Here is a performance comparison of DrugGuard's semantic models against traditional filtering methods:
+DrugGuard solves this with a **hybrid multimodal detection architecture** operating in real-time with **sub-300ms latency**.
 
-| Method | Scan Speed / Latency | Algospeak Resilient? | Handles Images? | Moderation Accuracy |
-| :--- | :---: | :---: | :---: | :---: |
-| **Traditional Keyword Filter** | ~1 ms | ❌ No | ❌ No | Low (easily bypassed) |
-| **Traditional Regex Filter** | ~2 ms | ❌ No | ❌ No | Low (needs constant manual regex updates) |
-| **DrugGuard NLP Classifier** | **< 5 ms** | **⚡ Yes** | ❌ No | **Very High (98.33% Accuracy)** |
-| **DrugGuard Multimodal OCR** | **150 - 300 ms** | **⚡ Yes** | **⚡ Yes** | **Very High (Full Text + Image Extraction)** |
-| **Traditional Vision/OCR (e.g. Tesseract)** | > 1200 ms | ❌ No | ⚡ Yes | Medium (creates significant page load lag) |
+```
+[ Web Page DOM Content ]
+        │
+        ├──► Extract Text ──► [ Semantic Normalization ] ──► [ DistilBERT (ONNX) ] ┐
+        │                                                                           ├─► [ Multimodal Fusion ] ──► [ Chrome Extension Overlay ]
+        └──► Extract Images ───────────────────────────────► [ MobileNetV2 (ONNX) ] ┘
+```
 
-### Real-Time Decision & Scanning Pipeline
-The flowchart below outlines the processing flow and execution times for scanning a single webpage element:
+### 1. Semantic Normalization Layer
+Before machine learning classification, raw text passes through a deterministic normalization pipeline:
+- **Emoji Decoding**: Maps contextual drug emojis (e.g., ❄️ $\rightarrow$ cocaine, 🍃 $\rightarrow$ cannabis, 💊 $\rightarrow$ pills) into explicit semantic tokens.
+- **Leetspeak & Character De-obfuscation**: Resolves obfuscated spellings (`x*nax` $\rightarrow$ `xanax`, `p1lls` $\rightarrow$ `pills`, `dr*gs` $\rightarrow$ `drugs`).
+- **Slang Jargon Translation**: Normalizes underground trade jargon into standard vocabulary for transformer processing.
 
-```mermaid
-graph TD
-    A[Webpage Element Rendered] --> B{Is it Image or Text?}
-    
-    B -- Text Content --> C[Run DrugGuard NLP Classifier <br> <i>Speed: < 5ms</i>]
-    C --> D{Calculate Risk Score}
-    D -- Risk >= 70% --> E[Block 🔴 <br> <i>Action: Blur element + Red shield banner</i>]
-    D -- Risk 40% - 70% --> F[Warn 🟡 <br> <i>Action: Yellow border + Warning badge</i>]
-    D -- Risk < 40% --> G[Safe 🟢 <br> <i>Action: No UI modification</i>]
-    
-    B -- Image Content --> H[Extract Text via RapidOCR Backend <br> <i>Speed: 150ms - 300ms</i>]
-    H --> C
+### 2. Transformer NLP Text Classifier (DistilBERT ONNX)
+- Uses a fine-tuned **DistilBERT** model converted to **ONNX Runtime** format for ultra-fast local inference.
+- Evaluates contextual semantics and algospeak patterns, returning a text risk probability score $S_{text} \in [0, 1]$ and identified risk keywords.
+- *Fallback Mechanism*: Includes a TF-IDF + Logistic Regression secondary pipeline if ONNX runtime is unavailable.
+
+### 3. Computer Vision Image Classifier (MobileNetV2 ONNX)
+- Analyzes visual content (images, post attachments, thumbnails) using a fine-tuned **MobileNetV2** CNN exported to ONNX format.
+- Detects illicit substance imagery, pill press shapes, and drug paraphernalia, producing a vision risk probability score $S_{vision} \in [0, 1]$.
+
+### 4. Multimodal Fusion Engine
+Integrates text and image probability scores via a weighted decision algorithm:
+
+$$\text{Risk Score} = w_t \cdot S_{text} + w_v \cdot S_{vision}$$
+
+- **High Risk ($\ge 0.70$ or explicit drug match)**: Triggers **BLOCK** action.
+- **Medium Risk ($0.35 - 0.69$)**: Triggers **WARN** action.
+- **Low Risk ($< 0.35$)**: Allows content as **SAFE**.
+
+### 5. Client-Side Browser Intervention (Chrome Extension v4.0)
+- **Non-intrusive DOM Blurring**: High-risk posts and illicit images are automatically blurred with heavy CSS filter (`blur(16px)`).
+- **Top-Bar Action Banners**: Displays a sleek red top banner (`🛡️ Blocked: Coded drug content detected`) with a prominent **REVEAL** button.
+- **Red Highlight on Reveal**: Clicking **REVEAL** un-blurs the content and highlights dangerous text in a distinct red left border and light red background.
+- **Warning Highlight**: Medium-risk content is highlighted with a yellow background and border (no blur) with a **DISMISS** button.
+
+---
+
+## 📂 File & Project Structure
+
+```
+DrugGuard-Detection-System/
+├── assets/                                    # Project Visual Assets
+│   ├── logo.png                               # DrugGuard Shield Logo
+│   └── banner.png                             # GitHub Repository Banner
+├── extension/                                 # Chrome Extension (Manifest V3)
+│   ├── manifest.json                          # Manifest V3 configuration (v4.0.0)
+│   ├── content_script.js                      # DOM scraper & v4.0 overlay injector
+│   ├── background.js                          # Service worker & extension coordinator
+│   ├── popup.html                             # Control panel popup UI (v4.0 Indigo Theme)
+│   └── popup.js                               # Real-time toggle & threshold slider controls
+├── backend/                                   # FastAPI Machine Learning Server
+│   ├── server.py                              # REST API endpoint with ONNX inference engine
+│   ├── requirements.txt                       # Python dependencies
+│   ├── setup_dataset_v3.py                    # Algospeak dataset generator script
+│   ├── train_text_model.py                    # Local DistilBERT ONNX training pipeline
+│   ├── train_image_model.py                   # Local MobileNetV2 ONNX vision training pipeline
+│   ├── evaluate_models.py                     # Model benchmark & accuracy evaluation
+│   ├── DrugGuard_Text_Training.ipynb          # DistilBERT Colab notebook
+│   └── DrugGuard_Image_Training.ipynb         # MobileNetV2 Colab notebook
+├── train/                                     # Exported ONNX & Model Artifacts
+│   ├── text_model.onnx                        # Fine-tuned DistilBERT ONNX model
+│   ├── text_model.onnx.data                   # Transformer weights binary
+│   ├── image_model.onnx                       # MobileNetV2 vision ONNX model
+│   ├── image_model.onnx.data                  # Vision model weights binary
+│   ├── vectorizer.pkl                         # TF-IDF feature extractor fallback
+│   ├── text_model.pkl                         # Logistic Regression fallback model
+│   └── image_classes.json                     # Vision class mapping dictionary
+├── paper/                                     # IEEE Academic Research Paper
+│   ├── algospeak.md                           # Full IEEE formatted research paper (Markdown)
+│   ├── algospeak_paper.pdf                    # Published IEEE format paper (PDF document)
+│   └── image/                                 # System architecture diagrams & paper figures
+├── test_page.html                             # End-to-End Verification Test Suite Webpage
+└── README.md                                  # Project Documentation
 ```
 
 ---
 
-## ⚙️ Core Architecture & Features
+## 🚀 How to Run the Project
 
-### 1. Natural Language Processing (NLP) Backend
-* **Robust Dataset**: Trained on 1,200 rows containing balanced drug trafficking templates, emoji-coded slang, and hard negatives (legitimate news reports, medical pharmacy guidelines, and standar[...]
-* **Naive Bayes Classifier**: Utilizes `CountVectorizer` paired with a `MultinomialNB` model. The vectorizer is configured to treat emoji characters as valid features alongside alphanumeric tokens[...]
-
-### 2. Live Browser Extension
-* **Content Injection**: A Chrome extension content script that periodically scans the webpage DOM for text elements.
-* **Intervention Actions**:
-  - **Block (Risk ≥ 70%)**: Instantly blurs the text/image and overlays a red banner to hide illicit content.
-  - **Warn (Risk 40-70%)**: Adds a warning badge and a yellow outline to suspicious elements.
-  - **Safe (Risk < 40%)**: Leaves content untouched.
-
-### 3. Multimodal Image OCR
-* Integrated with `RapidOCR` on the `/predict_image` endpoint.
-* Extracts embedded text from image flyers, posts, and ads (even with stylized fonts) and runs predictions on the extracted text.
-
----
-
-## 🧪 Visual Test Cases
-
-You can verify the live OCR scanning functionality using the generated flyer test cases in the project root:
-
-| Test Image | Type | Description | Expected Model Action |
-| :---: | :--- | :--- | :--- |
-| **`drug_image.png`** | Illicit Flyer | Contains red styling and text: *"Special offer... Cocaine & powder available... Contact dealer"* | **Block** 🔴 (100% Risk) |
-| **`safe_image.png`** | Safe Flyer | Contains green styling and text: *"Organic Japanese Matcha Tea... Rich in antioxidants"* | **Safe** 🟢 (0% Risk) |
-
----
-
-## 📁 Repository Structure
-
-```
-.
-├── ML-Dome/                  --> Backend ML, Server, and model assets
-│   ├── app.py                --> Interactive CLI test app
-│   ├── server.py             --> FastAPI server (handles /predict and /predict_image)
-│   ├── train_model.py        --> Model training and evaluation script
-│   ├── setup_dataset_v2.py   --> Synthetic dataset generator with hard negatives
-│   ├── dataset.csv           --> Labeled dataset of 1,200 entries
-│   ├── text_model.pkl        --> Saved trained Naive Bayes classifier
-│   └── vectorizer.pkl        --> Saved vocabulary vectorizer
-│
-├── project/
-│   └── extension/            --> Chrome Extension source code
-│       ├── manifest.json     --> Extension manifest configuration
-│       ├── content_script.js --> Live webpage DOM scanner & styling injector
-│       └── popup.html/js     --> UI popup controller
-│
-├── paper/                    --> Research paper and conversion utility
-│   ├── algospeak..pdf        --> IEEE research paper (PDF)
-│   ├── algospeak.md          --> Decoded paper content (Markdown)
-│   └── pdf_to_md.py          --> PDF to Markdown conversion script
-│
-├── media/                    --> Directory containing live test screenshots and charts
-│   ├── Screenshot 2026-06-11 234801.png
-│   ├── Screenshot 2026-06-11 234935.png
-│   └── Screenshot 2026-06-11 235049.png
-│
-├── drug_image.png / safe_image.png --> Pre-generated OCR test images
-├── test_page.html            --> Extension test sandbox page (highly styled)
-├── drug_test.html            --> Simple forum board test sandbox page
-├── extension_preview.png     --> Extension preview banner image
-└── README.md                 --> Main project documentation
-```
-
----
-
-## 🚀 How to Run Locally
-
-### 1. Install Requirements
-Ensure you have Python 3.8+ installed:
+### Step 1: Clone the Repository & Setup Python Environment
 ```bash
-pip install pandas scikit-learn fastapi uvicorn pillow openpyxl rapidocr-onnxruntime requests
+git clone https://github.com/Sowndhar-2005/DrugGuard-Detection-System.git
+cd DrugGuard-Detection-System
 ```
 
-### 2. Start the Backend Server
-Run the uvicorn API:
+Create and activate a virtual environment (optional but recommended):
 ```bash
-cd ML-Dome
+python -m venv venv
+# On Windows PowerShell:
+.\venv\Scripts\Activate.ps1
+# On Linux/macOS:
+source venv/bin/activate
+```
+
+Install backend dependencies:
+```bash
+cd backend
+pip install -r requirements.txt
+```
+
+### Step 2: Start the FastAPI Backend Server
+Run the FastAPI inference server:
+```bash
 python server.py
 ```
-* Backend API documentation will be available at: `http://localhost:8000/docs`
-* Health check: `http://localhost:8000/health`
+- The backend server will load the ONNX models (`text_model.onnx` and `image_model.onnx`) from the `train/` directory.
+- The server listens at `http://localhost:8000`. You can verify API health by navigating to `http://localhost:8000/docs` in your browser.
 
-### 3. Load the Browser Extension
-1. Open Google Chrome and navigate to `chrome://extensions/`.
-2. Enable **Developer mode** (top-right toggle).
-3. Click **Load unpacked** (top-left button).
-4. Select the `project/extension` folder from this repository.
+### Step 3: Load the Chrome Extension (Manifest V3)
+1. Open **Google Chrome**.
+2. Navigate to `chrome://extensions/` in the address bar.
+3. Enable **Developer mode** using the toggle switch in the top-right corner.
+4. Click the **Load unpacked** button in the top-left corner.
+5. Select the `extension/` directory from this project folder.
+6. The **DrugGuard Protection System (v4.0.0)** extension icon will appear in your extensions bar!
 
-### 4. Test Live Detection
-Open the local test pages in your browser to see the extension scan, highlight, and blur blocks of text on the test page automatically:
-* **Styled Extension Test Page**: 👉 `http://localhost:8000/static/test_page.html`
-* **Street Market Forum Sandbox**: 👉 `http://localhost:8000/static/drug_test.html`
+---
+
+## 🧪 How to Test the System
+
+1. Ensure the backend server is running (`python server.py` at `http://localhost:8000`).
+2. Open `test_page.html` in Chrome (or via a local HTTP server like Live Server `http://127.0.0.1:5500/test_page.html`).
+3. Observe real-time intervention across the 3 test sections:
+
+| Test Section | Content Type | Expected Behavior | Visual Result |
+|---|---|---|---|
+| **🚨 1. High Risk (Block)** | Emojis (🔌, ❄️, 🍃), Leetspeak (`x*nax`, `p1lls`), Opioids, Illicit Images | **BLOCKED** | Heavy blur + Red top banner (`🛡️ Blocked: Coded drug content detected`) + Image top banner |
+| **⚠️ 2. Medium Risk (Warn)** | Prescription queries, dental postoperative painkiller questions | **WARNED** | Yellow background highlight + border + `Dismiss` button (No blur) |
+| **✅ 3. Low Risk (Safe)** | FDA clinical news, gym fitness posts, medical pill images | **SAFE** | Clean display, no interventions |
+
+### Testing Interactive Features:
+- **Reveal Content**: Click the **REVEAL** button on any blocked text post. The blur disappears, and the text highlights with a red left border and subtle red background.
+- **Reveal Image**: Click the **REVEAL** button at the top of any blocked image to reveal the image.
+- **Extension Popup Control**: Click the DrugGuard extension icon to open the Control Panel:
+  - Toggle protection ON/OFF.
+  - Adjust sensitivity threshold slider ($0.10 - 0.90$).
+  - View live session statistics (Texts scanned, Images scanned, Blocked count, Warned count).
+
+---
+
+## 📄 IEEE Academic Research Paper
+
+This project is backed by comprehensive academic research published in IEEE format:
+
+> **Title**: *Algospeak-Resilient Drug Trafficking Detection Using Transformer-Based Machine Learning and a Browser Extension*  
+> **Authors**: Agalya M, Kalaipriya S, Sowndhar A, Rajalingam B  
+> **Affiliation**: Department of CSE (AI & ML), KIT - Kalaignarkarunanidhi Institute of Technology, Coimbatore, India  
+> **Keywords**: Drug Trafficking Detection, Algospeak, Transformer Models, DistilBERT, Multimodal Learning, Semantic Normalization, Browser Extension, Real-Time Intervention.
+
+### Access Paper Formats:
+- 📖 **Markdown Format**: [paper/algospeak.md](file:///d:/Project/DrugGuard-Detection-System/paper/algospeak.md)
+- 📄 **PDF Format**: [paper/algospeak_paper.pdf](file:///d:/Project/DrugGuard-Detection-System/paper/algospeak_paper.pdf)
+
+### Benchmark Results:
+| Metric | Single-Modality Text | Single-Modality Vision | **DrugGuard Multimodal Fusion** |
+|---|---|---|---|
+| **Accuracy** | 88.4% | 85.2% | **94.0%** |
+| **F1-Score** | 0.86 | 0.83 | **0.92** |
+| **Precision** | 0.87 | 0.84 | **0.93** |
+| **Recall** | 0.85 | 0.82 | **0.91** |
+| **Latency** | 120 ms | 150 ms | **250–300 ms** (Sub-second real-time) |
+
+---
+
+## 🛡️ License
+
+This project is developed for academic research and educational demonstration purposes. All rights reserved &copy; 2026.
