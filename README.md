@@ -30,7 +30,7 @@ DrugGuard solves this with a **hybrid multimodal detection architecture** operat
 </p>
 <p align="center"><em>Figure 1: Full System Architectural Diagram detailing raw content ingestion, semantic normalization, dual ML classifiers, multimodal fusion engine, and Chrome Extension DOM intervention.</em></p>
 
-### 🔄 End-to-End Detection Flowchart
+### 🔄 End-to-End System Flowchart
 
 ```mermaid
 flowchart TD
@@ -64,29 +64,65 @@ Before machine learning classification, raw text passes through a deterministic 
 - **Leetspeak & Character De-obfuscation**: Resolves obfuscated spellings (`x*nax` $\rightarrow$ `xanax`, `p1lls` $\rightarrow$ `pills`, `dr*gs` $\rightarrow$ `drugs`).
 - **Slang Jargon Translation**: Normalizes underground trade jargon into standard vocabulary for transformer processing.
 
-<p align="center">
-  <img src="paper/image/paper_image/Semantic%20Normalization.png" alt="Semantic Normalization Architecture" width="750"/>
-</p>
-<p align="center"><em>Figure 2: Semantic Normalization Pipeline transforming emojis, leetspeak, and slang into structured token sequences.</em></p>
+#### 🔄 Semantic Normalization Pipeline Flowchart
+
+```mermaid
+flowchart TD
+    subgraph Input_Layer ["INPUT LAYER (Raw Text & Algospeak)"]
+        A["Raw Obfuscated Input<br/><i>e.g., 💊 available cheap dr*gs, ❄️, 🍃</i>"]
+    end
+
+    subgraph Normalization_Layer ["SEMANTIC NORMALIZATION LAYER"]
+        B["1. Emoji Mapping<br/>💊 → pill | ❄️ → cocaine | 🍃 → marijuana"]
+        C["2. Slang Decoder<br/>weed → marijuana | plug → dealer"]
+        D["3. Noise Cleaner & Leetspeak Resolver<br/>dr*gs → drugs | d r u g s → drugs"]
+        B --> C --> D
+    end
+
+    subgraph Output_Layer ["OUTPUT LAYER (Normalized Tokens)"]
+        E["Normalized Output Sequence (T_norm)<br/><b>pill marijuana available cheap drugs</b>"]
+    end
+
+    A --> B
+    D --> E
+```
+
+---
 
 ### 2. Transformer NLP Text Classifier (DistilBERT ONNX)
 - Uses a fine-tuned **DistilBERT** model converted to **ONNX Runtime** format for ultra-fast local inference.
 - Evaluates contextual semantics and algospeak patterns, returning a text risk probability score $S_{text} \in [0, 1]$ and identified risk keywords.
 - *Fallback Mechanism*: Includes a TF-IDF + Logistic Regression secondary pipeline if ONNX runtime is unavailable.
 
+---
+
 ### 3. Computer Vision Image Classifier (MobileNetV2 ONNX)
 - Analyzes visual content (images, post attachments, thumbnails) using a fine-tuned **MobileNetV2** CNN exported to ONNX format.
 - Detects illicit substance imagery, pill press shapes, and drug paraphernalia, producing a vision risk probability score $S_{vision} \in [0, 1]$.
 
+---
+
 ### 4. Multimodal Fusion Engine
 Integrates text and image probability scores via a weighted decision algorithm:
 
-$$\text{Risk Score} = w_t \cdot S_{text} + w_v \cdot S_{vision}$$
+$$\text{Risk Score} = w_t \cdot S_{text} + w_v \cdot S_{vision} \quad (w_t = 0.70, \, w_v = 0.30)$$
 
-<p align="center">
-  <img src="paper/image/paper_image/Multimodal%20Fusion%20Strategy.png" alt="Multimodal Fusion Strategy" width="750"/>
-</p>
-<p align="center"><em>Figure 3: Multimodal Fusion Engine integrating NLP and Vision prediction vectors.</em></p>
+#### 🔀 Multimodal Fusion Strategy Flowchart
+
+```mermaid
+flowchart TD
+    A["Text Input (T_norm)"] --> B["DistilBERT Model"]
+    C["Image Input (I)"] --> D["MobileNetV2 CNN"]
+    
+    B -->|Text Probability P_text| E["Weighted Fusion Layer<br/><b>S = α · P_text + (1 - α) · P_image</b><br/><i>(α = 0.70)</i>"]
+    D -->|Vision Probability P_image| E
+    
+    E --> F{Decision Module}
+    
+    F -->|Score < 0.35| G["✅ Safe (No Action)"]
+    F -->|0.35 ≤ Score < 0.70| H["⚠️ Suspicious (Warning Highlight)"]
+    F -->|Score ≥ 0.70| I["🚨 Harmful (CSS Blur + Red Block Banner)"]
+```
 
 ---
 
@@ -102,20 +138,26 @@ The DrugGuard browser extension implements a dynamic dual-tiered intervention mo
 
 ### Visual Comparison
 
-<table align="center" border="0" style="width: 100%; border-collapse: collapse;">
-  <tr>
-    <td align="center" style="width: 50%; vertical-align: top; padding: 10px;">
-      <h4>🚨 High-Risk Block State (Content Blurred)</h4>
-      <img src="assets/Block.png" alt="High Risk Block Intervention Screenshot" width="100%" style="border-radius: 8px; border: 1px solid #ef4444;"/>
-      <p style="font-size: 11px; color: #64748b; margin-top: 6px;"><em>Heavy blur applied to text and image content. Top red banner displays identified algospeak keywords and REVEAL button.</em></p>
-    </td>
-    <td align="center" style="width: 50%; vertical-align: top; padding: 10px;">
-      <h4>⚠️ Medium-Risk Warning State (Highlighted, Readable)</h4>
-      <img src="assets/warning%20.png" alt="Medium Risk Warning Intervention Screenshot" width="100%" style="border-radius: 8px; border: 1px solid #f59e0b;"/>
-      <p style="font-size: 11px; color: #64748b; margin-top: 6px;"><em>Soft yellow background highlight and border. Content remains 100% readable with a DISMISS button to clear warning.</em></p>
-    </td>
-  </tr>
-</table>
+<div style="display: flex; gap: 16px; justify-content: center; align-items: stretch; margin-top: 15px; margin-bottom: 20px;">
+  <div style="flex: 1; border: 1px solid #ef4444; border-radius: 10px; padding: 14px; background: rgba(239,68,68,0.03); display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <h4 align="center" style="margin-top: 0; color: #ef4444;">🚨 High-Risk Block State (Blurred)</h4>
+      <img src="assets/Block.png" alt="High Risk Block State" style="width: 100%; height: 250px; object-fit: contain; border-radius: 6px;"/>
+    </div>
+    <p align="center" style="font-size: 12px; color: #64748b; margin-bottom: 0; margin-top: 10px;">
+      <em>Heavy CSS blur applied to text and images. Top red banner displays identified algospeak keywords with REVEAL button.</em>
+    </p>
+  </div>
+  <div style="flex: 1; border: 1px solid #f59e0b; border-radius: 10px; padding: 14px; background: rgba(245,158,11,0.03); display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <h4 align="center" style="margin-top: 0; color: #f59e0b;">⚠️ Medium-Risk Warning State (Readable)</h4>
+      <img src="assets/warning%20.png" alt="Medium Risk Warning State" style="width: 100%; height: 250px; object-fit: contain; border-radius: 6px;"/>
+    </div>
+    <p align="center" style="font-size: 12px; color: #64748b; margin-bottom: 0; margin-top: 10px;">
+      <em>Soft yellow background highlight and left border. Content remains 100% readable with DISMISS button.</em>
+    </p>
+  </div>
+</div>
 
 ---
 
@@ -162,10 +204,8 @@ DrugGuard-Detection-System/
 ├── paper/                                                 # IEEE Academic Research Paper & Figures
 │   ├── algospeak.md                                       # Full IEEE Research Paper (Markdown)
 │   ├── algospeak_paper.pdf                                # IEEE Research Paper Document (PDF)
-│   └── image/paper_image/                                 # Architectural & Multimodal Flowchart Diagrams
-│       ├── Architectural Diagram.png                      # System Architectural Diagram
-│       ├── Semantic Normalization.png                    # Semantic Normalization Pipeline Diagram
-│       └── Multimodal Fusion Strategy.png                 # Multimodal Fusion Strategy Diagram
+│   └── image/paper_image/                                 # Architectural Diagram Figures
+│       └── Architectural Diagram.png                      # System Architectural Diagram
 ├── test_page.html                                         # End-to-End Verification Test Webpage
 └── README.md                                              # Project Documentation
 ```
