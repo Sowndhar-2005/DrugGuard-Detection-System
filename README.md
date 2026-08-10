@@ -9,7 +9,7 @@
   <a href="test_page.html"><img src="https://img.shields.io/badge/Test%20Suite-test__page.html-orange?style=for-the-badge&logo=html5" alt="Test Page"/></a>
   <a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi" alt="FastAPI"/></a>
   <a href="https://onnxruntime.ai/"><img src="https://img.shields.io/badge/ML%20Inference-ONNX%20Runtime-blueviolet?style=for-the-badge&logo=onnx" alt="ONNX Runtime"/></a>
-  <a href="https://developer.chrome.com/docs/extensions/mv3/intro/"><img src="https://img.shields.io/badge/Chrome%20Extension-Manifest%20V3-4285F4?style=for-the-badge&logo=googlechrome" alt="Manifest V3"/></a>
+  <a href="https://developer.chrome.com/docs/extensions/mv3/intro/"><img src="https://img.shields.io/badge/Chrome%20Extension-Manifest%20V3-4285F4?style=for-the-badge&logo=googlechrome" alt="Manif..."/></a>
   <a href="paper/algospeak_paper.pdf"><img src="https://img.shields.io/badge/IEEE%20Paper-PDF%20Format-red?style=for-the-badge&logo=adobeacrobatreader" alt="IEEE Paper PDF"/></a>
 </p>
 
@@ -19,7 +19,7 @@
 
 ## 📌 System Architecture & Detection Flow
 
-**DrugGuard** addresses the rapid growth of illicit drug trafficking on social media platforms, where sellers use evasive communication tactics—collectively known as **algospeak** (emojis like ❄️🍃💊, leetspeak, intentional misspellings like `x*nax`, `p1lls`, and coded jargon). Conventional keyword moderation filters fail against these obfuscation techniques, and platform-level moderation is often post-hoc (reactive).
+**DrugGuard** addresses the rapid growth of illicit drug trafficking on social media platforms, where sellers use evasive communication tactics—collectively known as **algospeak** (emojis like �[...] 
 
 DrugGuard solves this with a **hybrid multimodal detection architecture** operating in real-time with **sub-300ms latency**.
 
@@ -28,7 +28,7 @@ DrugGuard solves this with a **hybrid multimodal detection architecture** operat
 <p align="center">
   <img src="paper/image/paper_image/Architectural%20Diagram.png" alt="DrugGuard System Architectural Diagram" width="850"/>
 </p>
-<p align="center"><em>Figure 1: Full System Architectural Diagram detailing raw content ingestion, semantic normalization, dual ML classifiers, multimodal fusion engine, and Chrome Extension DOM intervention.</em></p>
+<p align="center"><em>Figure 1: Full System Architectural Diagram detailing raw content ingestion, semantic normalization, dual ML classifiers, multimodal fusion engine, and Chrome Extension DOM i[...]
 
 ### 🔄 End-to-End System Flowchart
 
@@ -142,7 +142,7 @@ The DrugGuard browser extension implements a dynamic dual-tiered intervention mo
   <div style="flex: 1; border: 1px solid #ef4444; border-radius: 10px; padding: 14px; background: rgba(239,68,68,0.03); display: flex; flex-direction: column; justify-content: space-between;">
     <div>
       <h4 align="center" style="margin-top: 0; color: #ef4444;">🚨 High-Risk Block State (Blurred)</h4>
-      <img src="assets/Block.png" alt="High Risk Block State" style="width: 100%; height: 250px; object-fit: contain; border-radius: 6px;"/>
+      <img src="drug_image.png" alt="High Risk Block State" style="width: 100%; height: 250px; object-fit: contain; border-radius: 6px;"/>
     </div>
     <p align="center" style="font-size: 12px; color: #64748b; margin-bottom: 0; margin-top: 10px;">
       <em>Heavy CSS blur applied to text and images. Top red banner displays identified algospeak keywords with REVEAL button.</em>
@@ -151,7 +151,7 @@ The DrugGuard browser extension implements a dynamic dual-tiered intervention mo
   <div style="flex: 1; border: 1px solid #f59e0b; border-radius: 10px; padding: 14px; background: rgba(245,158,11,0.03); display: flex; flex-direction: column; justify-content: space-between;">
     <div>
       <h4 align="center" style="margin-top: 0; color: #f59e0b;">⚠️ Medium-Risk Warning State (Readable)</h4>
-      <img src="assets/warning%20.png" alt="Medium Risk Warning State" style="width: 100%; height: 250px; object-fit: contain; border-radius: 6px;"/>
+      <img src="drug_image.png" alt="Medium Risk Warning State" style="width: 100%; height: 250px; object-fit: contain; border-radius: 6px;"/>
     </div>
     <p align="center" style="font-size: 12px; color: #64748b; margin-bottom: 0; margin-top: 10px;">
       <em>Soft yellow background highlight and left border. Content remains 100% readable with DISMISS button.</em>
@@ -166,7 +166,7 @@ The DrugGuard browser extension implements a dynamic dual-tiered intervention mo
 The DrugGuard extension features an intuitive control panel accessible directly from the browser toolbar, allowing users to monitor session activity and customize moderation sensitivity.
 
 <p align="center">
-  <img src="assets/pop_up_ui.png" alt="DrugGuard Chrome Extension Control Panel Popup UI" width="380" style="border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);"/>
+  <img src="drug_image.png" alt="DrugGuard Chrome Extension Control Panel Popup UI" width="380" style="border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);"/>
 </p>
 <p align="center"><em>Figure 4: DrugGuard v4.0 Control Panel Popup UI with real-time statistics and sensitivity slider.</em></p>
 
@@ -190,9 +190,7 @@ DrugGuard-Detection-System/
 ├── assets/                                                # Visual Assets & Interface Screenshots
 │   ├── logo.svg                                           # Vector Shield Logo
 │   ├── banner.svg                                         # GitHub Repository Header Banner
-│   ├── Block.png                                          # High-Risk Block State Screenshot
-│   ├── warning .png                                       # Medium-Risk Warning State Screenshot
-│   └── pop_up_ui.png                                      # Extension Popup Dashboard Screenshot
+│   └── (add additional screenshots here, e.g., Block.png, warning.png, pop_up_ui.png)
 ├── backend/                                               # FastAPI REST Server & ML Pipeline
 │   ├── server.py                                          # Inference API server with ONNX engine
 │   └── requirements.txt                                   # Python dependencies
