@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DrugGuard Control Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0c0f1a;
+      --surface: #151929;
+      --surface-2: #1c2237;
+      --border: #252d45;
+      --text: #f1f5f9;
+      --text-muted: #8892b0;
+      --accent: #6366f1;
+      --accent-glow: rgba(99,102,241,0.25);
+      --red: #ef4444;
+      --red-dim: rgba(239,68,68,0.12);
+      --green: #22c55e;
+      --green-dim: rgba(34,197,94,0.12);
+      --amber: #f59e0b;
+      --amber-dim: rgba(245,158,11,0.12);
+      --purple: #a78bfa;
+      --purple-dim: rgba(167,139,250,0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { scrollbar-width: none; -ms-overflow-style: none; }
+    ::-webkit-scrollbar { display: none; }
+
+    body {
+      width: 340px;
+      min-height: 440px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      padding: 0;
+      overflow-x: hidden;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: linear-gradient(135deg, #1a1f36, #252d50);
+      padding: 18px 20px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-icon {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--accent), #818cf8);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      box-shadow: 0 4px 14px var(--accent-glow);
+    }
+    .brand-name {
+      font-weight: 800;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+    }
+    .brand-name span {
+      background: linear-gradient(135deg, #818cf8, #6366f1);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .brand-ver {
+      font-size: 10px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* ── Toggle ── */
+    .toggle-wrap { display: flex; align-items: center; gap: 8px; }
+    .toggle {
+      position: relative;
+      width: 44px; height: 24px;
+      cursor: pointer;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      position: absolute;
+      inset: 0;
+      background: #374151;
+      border-radius: 24px;
+      transition: background 0.3s;
+    }
+    .toggle-track::after {
+      content: '';
+      position: absolute;
+      width: 18px; height: 18px;
+      left: 3px; top: 3px;
+      background: white;
+      border-radius: 50%;
+      transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+    }
+    .toggle input:checked + .toggle-track {
+      background: var(--green);
+    }
+    .toggle input:checked + .toggle-track::after {
+      transform: translateX(20px);
+    }
+
+    /* ── Content area ── */
+    .content { padding: 16px 20px 20px; }
+
+    /* ── Status pill ── */
+    .status-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .status-active {
+      background: var(--green-dim);
+      color: var(--green);
+    }
+    .status-inactive {
+      background: var(--red-dim);
+      color: var(--red);
+    }
+    .status-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      box-shadow: 0 0 8px currentColor;
+    }
+    .btn-refresh {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .btn-refresh:hover {
+      background: var(--surface);
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    /* ── URL display ── */
+    .url-bar {
+      font-size: 11px;
+      color: var(--text-muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 7px 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      word-break: break-all;
+      line-height: 1.4;
+    }
+
+    /* ── Stats grid ── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 12px;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+      cursor: default;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+    }
+    .stat-icon { font-size: 16px; margin-bottom: 6px; }
+    .stat-val {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 2px;
+    }
+    .stat-lbl {
+      font-size: 10px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .stat-card.text-scan { border-color: rgba(99,102,241,0.3); }
+    .stat-card.text-scan .stat-val { color: var(--accent); }
+    .stat-card.text-scan:hover { border-color: var(--accent); }
+
+    .stat-card.img-scan { border-color: rgba(167,139,250,0.3); }
+    .stat-card.img-scan .stat-val { color: var(--purple); }
+    .stat-card.img-scan:hover { border-color: var(--purple); }
+
+    .stat-card.blocked { border-color: rgba(239,68,68,0.3); }
+    .stat-card.blocked .stat-val { color: var(--red); }
+    .stat-card.blocked:hover { border-color: var(--red); }
+
+    .stat-card.warned { border-color: rgba(245,158,11,0.3); }
+    .stat-card.warned .stat-val { color: var(--amber); }
+    .stat-card.warned:hover { border-color: var(--amber); }
+
+    /* ── Settings ── */
+    .settings-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+    }
+    .setting-row {
+      margin-bottom: 12px;
+    }
+    .setting-row:last-child { margin-bottom: 0; }
+    .setting-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .setting-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .setting-value {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      font-variant-numeric: tabular-nums;
+    }
+    .setting-range {
+      width: 100%;
+      height: 6px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: var(--border);
+      border-radius: 6px;
+      outline: none;
+      cursor: pointer;
+    }
+    .setting-range::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 2px 6px var(--accent-glow);
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .setting-range::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+    .setting-hint {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ── Buttons ── */
+    .btn-group { display: flex; flex-direction: column; gap: 8px; }
+    .btn-primary {
+      width: 100%;
+      padding: 11px;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: linear-gradient(135deg, var(--accent), #818cf8);
+      color: white;
+      box-shadow: 0 4px 12px var(--accent-glow);
+    }
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px var(--accent-glow);
+    }
+    .btn-ghost {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      background: transparent;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+    .btn-ghost:hover {
+      background: var(--surface);
+      color: var(--text);
+      border-color: var(--text-muted);
+    }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      font-size: 10px;
+      color: var(--text-muted);
+      padding: 10px 20px 14px;
+      border-top: 1px solid var(--border);
+      margin-top: 4px;
+    }
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="brand">
+      <div class="brand-icon">🛡️</div>
+      <div>
+        <div class="brand-name"><span>DrugGuard</span></div>
+        <div class="brand-ver">v4.0 • Content Protection</div>
+      </div>
+    </div>
+    <label class="toggle">
+      <input type="checkbox" id="extension-toggle" checked>
+      <div class="toggle-track"></div>
+    </label>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+
+    <!-- Status Row -->
+    <div class="status-row">
+      <div id="status-badge" class="status-pill status-active">
+        <span class="status-dot"></span>
+        Active Protection
+      </div>
+      <button id="refresh-page-btn" class="btn-refresh">🔄 Rescan</button>
+    </div>
+
+    <!-- Active URL -->
+    <div id="active-url-display" class="url-bar">🌐 Loading…</div>
+
+    <!-- Stats -->
+    <div class="section-label">Live Session Analytics</div>
+    <div class="stats-grid">
+      <div class="stat-card text-scan">
+        <div class="stat-icon">📝</div>
+        <div class="stat-val" id="stat-scanned-text">0</div>
+        <div class="stat-lbl">Texts Scanned</div>
+      </div>
+      <div class="stat-card img-scan">
+        <div class="stat-icon">🖼️</div>
+        <div class="stat-val" id="stat-scanned-img">0</div>
+        <div class="stat-lbl">Images Scanned</div>
+      </div>
+      <div class="stat-card blocked">
+        <div class="stat-icon">🚫</div>
+        <div class="stat-val" id="stat-blocked">0</div>
+        <div class="stat-lbl">Blocked</div>
+      </div>
+      <div class="stat-card warned">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-val" id="stat-warned">0</div>
+        <div class="stat-lbl">Warned</div>
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="section-label">Detection Settings</div>
+    <div class="settings-card">
+      <div class="setting-row">
+        <div class="setting-header">
+          <span class="setting-label">Block Sensitivity</span>
+          <span class="setting-value" id="threshold-val">0.70</span>
+        </div>
+        <input type="range" class="setting-range" id="threshold-range" min="0.1" max="0.9" step="0.05" value="0.7">
+        <div class="setting-hint">
+          <span>🔓 Lenient</span>
+          <span>🔒 Strict</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="btn-group">
+      <button class="btn-primary" id="save-settings-btn">💾 Save Configuration</button>
+      <button class="btn-ghost" id="reset-stats-btn">🗑️ Reset Session Stats</button>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    DrugGuard v4.0 &copy; 2026 &middot; Academic Research Project
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

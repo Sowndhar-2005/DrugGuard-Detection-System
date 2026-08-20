@@ -1,407 +1,379 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DrugGuard — Extension Test Page</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DrugGuard System — Multimodal Verification Suite</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      
+      --block-color: #ef4444;
+      --block-bg: #fef2f2;
+      --block-border: #fca5a5;
+
+      --warn-color: #f59e0b;
+      --warn-bg: #fffbeb;
+      --warn-border: #fcd34d;
+
+      --safe-color: #10b981;
+      --safe-bg: #ecfdf5;
+      --safe-border: #6ee7b7;
+
+      --accent-blue: #3b82f6;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       font-family: 'Inter', sans-serif;
-      background: #0d0d14;
-      color: #e2e2ea;
-      min-height: 100vh;
+      background-color: #f8fafc;
+      color: var(--text-main);
+      line-height: 1.6;
+      padding-bottom: 60px;
+    }
+
+    /* Top Hero Header */
+    .hero-header {
+      background: var(--bg-gradient);
+      color: white;
       padding: 40px 20px;
-    }
-
-    .page-header {
       text-align: center;
-      margin-bottom: 48px;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.3);
+      position: relative;
     }
 
-    .page-header h1 {
-      font-size: 28px;
-      font-weight: 700;
-      background: linear-gradient(90deg, #c7d2fe, #a5b4fc);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
-    }
-
-    .page-header p {
-      color: #6b7280;
-      font-size: 14px;
-    }
-
-    .status-banner {
-      max-width: 860px;
-      margin: 0 auto 40px;
-      background: rgba(99, 102, 241, 0.1);
-      border: 1px solid rgba(99, 102, 241, 0.3);
-      border-radius: 12px;
-      padding: 14px 20px;
+    .hero-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 12px;
+    }
+
+    .hero-subtitle {
+      font-size: 15px;
+      color: #94a3b8;
+      max-width: 650px;
+      margin: 0 auto 20px;
+    }
+
+    .system-status-bar {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      padding: 8px 18px;
+      border-radius: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
       font-size: 13px;
-      color: #a5b4fc;
+      color: #cbd5e1;
     }
 
     .status-dot {
-      width: 10px;
-      height: 10px;
-      background: #22c55e;
+      width: 8px;
+      height: 8px;
+      background-color: #10b981;
       border-radius: 50%;
-      box-shadow: 0 0 8px rgba(34,197,94,0.6);
-      animation: pulse 2s infinite;
-      flex-shrink: 0;
+      box-shadow: 0 0 10px #10b981;
     }
 
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
-
-    .grid {
-      max-width: 860px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 24px;
+    /* Container Layout */
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 0 20px;
     }
 
-    @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
-
-    .card {
-      background: #13131f;
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 14px;
-      overflow: hidden;
+    /* Quick Jump Nav Bar */
+    .nav-pills {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
     }
 
-    .card-header {
-      padding: 14px 18px;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+    .nav-pill {
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .nav-pill:hover {
+      transform: translateY(-2px);
+    }
+
+    .pill-block { background: var(--block-bg); color: var(--block-color); border: 1px solid var(--block-border); }
+    .pill-warn { background: var(--warn-bg); color: var(--warn-color); border: 1px solid var(--warn-border); }
+    .pill-safe { background: var(--safe-bg); color: var(--safe-color); border: 1px solid var(--safe-border); }
+
+    /* Section Cards */
+    .test-section {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 32px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      border: 1px solid var(--border-color);
+    }
+
+    .section-header {
       display: flex;
       align-items: center;
-      gap: 8px;
+      justify-content: space-between;
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 14px;
+      margin-bottom: 20px;
     }
 
-    .card-header.drug {
-      background: rgba(248, 113, 113, 0.08);
-      border-bottom: 1px solid rgba(248,113,113,0.15);
-      color: #f87171;
-    }
-
-    .card-header.safe {
-      background: rgba(34, 197, 94, 0.08);
-      border-bottom: 1px solid rgba(34,197,94,0.15);
-      color: #22c55e;
-    }
-
-    .card-header.warn {
-      background: rgba(251, 191, 36, 0.08);
-      border-bottom: 1px solid rgba(251,191,36,0.15);
-      color: #fbbf24;
-    }
-
-    .card-body {
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-    }
-
-    /* Each text block is a paragraph — exactly what content_script.js targets */
-    p.test-block {
-      font-size: 14px;
-      line-height: 1.6;
-      color: #d1d5db;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 8px;
-      padding: 12px 14px;
-    }
-
-    .section-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: #4b5563;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      margin-bottom: 4px;
-    }
-
-    .legend {
-      max-width: 860px;
-      margin: 40px auto 0;
-      background: #13131f;
-      border: 1px solid rgba(255,255,255,0.07);
-      border-radius: 14px;
-      padding: 20px 24px;
-    }
-
-    .legend h3 {
-      font-size: 12px;
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 20px;
       font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: #6b7280;
-      margin-bottom: 14px;
-    }
-
-    .legend-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-    }
-
-    .legend-item {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       gap: 10px;
-      font-size: 13px;
     }
 
-    .legend-icon { font-size: 20px; flex-shrink: 0; }
-
-    .legend-title { font-weight: 600; color: #e2e2ea; margin-bottom: 2px; }
-    .legend-desc  { color: #6b7280; font-size: 12px; }
-
-    .server-check {
-      max-width: 860px;
-      margin: 0 auto 32px;
-      background: rgba(251, 191, 36, 0.06);
-      border: 1px solid rgba(251,191,36,0.2);
+    /* Badges */
+    .badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
       border-radius: 12px;
-      padding: 14px 20px;
-      font-size: 13px;
-      color: #fbbf24;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
-    code {
-      background: rgba(255,255,255,0.08);
-      padding: 2px 7px;
-      border-radius: 4px;
-      font-family: 'Courier New', monospace;
-      font-size: 12px;
-      color: #c7d2fe;
+    .badge-block { background-color: var(--block-bg); color: var(--block-color); border: 1px solid var(--block-border); }
+    .badge-warn { background-color: var(--warn-bg); color: var(--warn-color); border: 1px solid var(--warn-border); }
+    .badge-safe { background-color: var(--safe-bg); color: var(--safe-color); border: 1px solid var(--safe-border); }
+
+    /* Social Posts */
+    .post {
+      background: #fafafa;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 18px;
+      transition: border-color 0.2s;
+    }
+
+    .post:last-child {
+      margin-bottom: 0;
+    }
+
+    .post-author-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .post-author {
+      font-weight: 700;
+      font-size: 14px;
+      color: #3b82f6;
+    }
+
+    .post-text {
+      font-size: 14px;
+      color: #334155;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+    /* Image Grids */
+    .image-grid {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .sample-img {
+      width: 125px;
+      height: 125px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      transition: transform 0.2s;
+    }
+
+    .sample-img:hover {
+      transform: scale(1.03);
     }
   </style>
 </head>
+
 <body>
 
-  <!-- Header -->
-  <div class="page-header">
-    <h1>🛡️ DrugGuard — Extension Test Page</h1>
-    <p>Open this page in Chrome with the extension loaded and server running to see live detection</p>
-  </div>
+  <!-- Hero Header -->
+  <header class="hero-header">
+    <h1 class="hero-title">
+      <span>🛡️</span> DrugGuard Verification Suite
+    </h1>
+    <p class="hero-subtitle">
+      Real-time client-side intervention page for testing Algospeak NLP text detection, MobileNetV2 vision recognition, and RapidOCR multimodal fusion.
+    </p>
+    <div class="system-status-bar">
+      <span class="status-dot"></span>
+      <span>Backend API: <strong>http://localhost:8000</strong></span>
+      <span>•</span>
+      <span>DistilBERT (ONNX) + MobileNetV2 (ONNX)</span>
+    </div>
+  </header>
 
-  <!-- Server Check Reminder -->
-  <div class="server-check">
-    ⚠️ Before testing: Make sure the server is running →
-    <code>cd ML-Dome &amp;&amp; py -3 server.py</code>
-    &nbsp;|&nbsp;
-    Check: <a href="http://localhost:8000/health" target="_blank" style="color:#fbbf24">localhost:8000/health</a>
-  </div>
+  <div class="container">
 
-  <!-- Status -->
-  <div class="status-banner">
-    <div class="status-dot"></div>
-    DrugGuard extension will automatically scan all text blocks below. Drug content will be
-    <strong style="color:#f87171">&nbsp;blurred (blocked)&nbsp;</strong> or marked with a
-    <strong style="color:#fbbf24">&nbsp;yellow outline (warned)</strong>. Safe text stays unchanged.
-  </div>
+    <!-- Quick Navigation Pills -->
+    <div class="nav-pills">
+      <a href="#section-block" class="nav-pill pill-block">🚨 1. Block Section (High Risk)</a>
+      <a href="#section-warn" class="nav-pill pill-warn">⚠️ 2. Warning Section (Medium Risk)</a>
+      <a href="#section-safe" class="nav-pill pill-safe">✅ 3. Safe Section (Low Risk)</a>
+    </div>
 
-  <!-- Test Cards -->
-  <div class="grid">
+    <!-- ==========================================
+         SECTION 1: BLOCK (HIGH RISK / OBFUSCATED)
+         ========================================== -->
+    <div class="test-section" id="section-block">
+      <div class="section-header">
+        <h2 class="section-title" style="color: var(--block-color);">
+          <span>🚨</span> 1. High Risk Content (Expected: BLOCK)
+        </h2>
+        <span class="badge badge-block">Expected: BLOCK</span>
+      </div>
 
-    <!-- HIGH RISK — Should be BLOCKED -->
-    <div class="card">
-      <div class="card-header drug">🔴 High Risk — Expect: BLURRED / BLOCKED</div>
-      <div class="card-body">
-        <div>
-          <div class="section-label">Direct trafficking text</div>
-          <p class="test-block" id="test-block">
-            Got powder available for pickup, DM for prices. Fresh batch just arrived.
-          </p>
+      <!-- Post 1: Coded Algospeak + Unsafe Images -->
+      <div class="post">
+        <div class="post-author-row">
+          <span class="post-author">@anon_dealer_01</span>
+          <span class="badge badge-block">BLOCK (Algospeak + Visual)</span>
         </div>
-        <div>
-          <div class="section-label">Supply chain language</div>
-          <p class="test-block">
-            Moving pills across the border this weekend. Wholesale goods available, bulk discounts apply.
-          </p>
+        <p class="post-text">🔌 got that premium ❄️ and 🍃 ready for delivery tonight in the city center. Fast drop-off, cash or BTC only. DM me for the menu!</p>
+        <div class="image-grid">
+          <img src="backend/image/unsafe/images.jpeg" alt="Illicit Substance Sample 1" class="sample-img">
+          <img src="backend/image/unsafe/images (1).jpeg" alt="Illicit Substance Sample 2" class="sample-img">
         </div>
-        <div>
-          <div class="section-label">Coded slang</div>
-          <p class="test-block">
-            Need crystal ASAP, anyone near downtown can deliver? My plug just re-upped, quality stash.
-          </p>
+      </div>
+
+      <!-- Post 2: Prescription Drug Trafficking + Unsafe Images -->
+      <div class="post">
+        <div class="post-author-row">
+          <span class="post-author">@party_vibes</span>
+          <span class="badge badge-block">BLOCK (Leetspeak + Visual)</span>
         </div>
-        <div>
-          <div class="section-label">Emoji-coded (algospeak)</div>
-          <p class="test-block">
-            Got that 🍃🍃🍃 ready, DM me for prices. 🔌 best ❄️ in town, hit me up. Fresh 💊💊 just landed, first come first served.
-          </p>
+        <p class="post-text">Selling fresh batch of x*nax and p1lls, discreet packaging guaranteed. Fast shipping, hit me up on Signal for cheap deals.</p>
+        <div class="image-grid">
+          <img src="backend/image/unsafe/images (2).jpeg" alt="Illicit Substance Sample 3" class="sample-img">
+          <img src="backend/image/unsafe/images.jpg" alt="Illicit Substance Sample 4" class="sample-img">
+        </div>
+      </div>
+
+      <!-- Post 3: Opioid Trade -->
+      <div class="post">
+        <div class="post-author-row">
+          <span class="post-author">@plug_connect</span>
+          <span class="badge badge-block">BLOCK (Opioid Keyword)</span>
+        </div>
+        <p class="post-text">Got percocets, oxy, and special k in stock. PGP verified seller, hit up my telegram group for immediate delivery 💊💊.</p>
+      </div>
+    </div>
+
+
+    <!-- ==========================================
+         SECTION 2: WARNING (MEDIUM RISK / BORDERLINE)
+         ========================================== -->
+    <div class="test-section" id="section-warn">
+      <div class="section-header">
+        <h2 class="section-title" style="color: var(--warn-color);">
+          <span>⚠️</span> 2. Medium Risk Content (Expected: WARN)
+        </h2>
+        <span class="badge badge-warn">Expected: WARN</span>
+      </div>
+
+      <!-- Post 1: Borderline Dosage Query -->
+      <div class="post">
+        <div class="post-author-row">
+          <span class="post-author">@pharm_inquiry</span>
+          <span class="badge badge-warn">WARN (Prescription Mention)</span>
+        </div>
+        <p class="post-text">Does anyone know if taking painkillers with cough syrup causes drowsiness? Looking for medical advice on managing pain after dental surgery.</p>
+      </div>
+
+      <!-- Post 2: Unverified Medication Trade -->
+      <div class="post">
+        <div class="post-author-row">
+          <span class="post-author">@health_swap</span>
+          <span class="badge badge-warn">WARN (Medication Trade)</span>
+        </div>
+        <p class="post-text">Trading leftover prescription antibiotics and mild pain medication from last month's treatment. DM if interested in swapping unused pharmacy items.</p>
+      </div>
+    </div>
+
+
+    <!-- ==========================================
+         SECTION 3: SAFE (LOW RISK / VERIFIED)
+         ========================================== -->
+    <div class="test-section" id="section-safe">
+      <div class="section-header">
+        <h2 class="section-title" style="color: var(--safe-color);">
+          <span>✅</span> 3. Low Risk Content (Expected: SAFE)
+        </h2>
+        <span class="badge badge-safe">Expected: SAFE</span>
+      </div>
+
+      <!-- Post 1: Medical News + Safe Images -->
+      <div class="post">
+        <div class="post-author-row">
+          <span class="post-author">@medical_news</span>
+          <span class="badge badge-safe">SAFE (Clinical Article)</span>
+        </div>
+        <p class="post-text">The FDA approved a new medication to help treat patients suffering from chronic hypertension and migraines. Ensure you consult with your doctor before altering your dosage.</p>
+        <div class="image-grid">
+          <img src="backend/image/safe/images.jpeg" alt="Medical News Sample 1" class="sample-img">
+          <img src="backend/image/safe/images (1).jpeg" alt="Medical News Sample 2" class="sample-img">
+        </div>
+      </div>
+
+      <!-- Post 2: Fitness & Community + Safe Images -->
+      <div class="post">
+        <div class="post-author-row">
+          <span class="post-author">@fitness_coach</span>
+          <span class="badge badge-safe">SAFE (Wellness)</span>
+        </div>
+        <p class="post-text">Looking for a gym buddy or running partner to work out together at the local community center. PM me if you're interested in weight training or cardio!</p>
+        <div class="image-grid">
+          <img src="backend/image/safe/images (2).jpeg" alt="Medical News Sample 3" class="sample-img">
+          <img src="backend/image/safe/images (3).jpeg" alt="Medical News Sample 4" class="sample-img">
         </div>
       </div>
     </div>
 
-    <!-- SAFE — Should be UNTOUCHED -->
-    <div class="card">
-      <div class="card-header safe">🟢 Safe Content — Expect: NO CHANGE</div>
-      <div class="card-body">
-        <div>
-          <div class="section-label">Everyday conversation</div>
-          <p class="test-block">
-            Just finished reading a great textbook about machine learning. Really enjoying the course.
-          </p>
-        </div>
-        <div>
-          <div class="section-label">Shopping / marketplace</div>
-          <p class="test-block">
-            Selling my old laptop on the marketplace, barely used. Comes with original charger and box.
-          </p>
-        </div>
-        <div>
-          <div class="section-label">Social plans</div>
-          <p class="test-block">
-            Going to the park this weekend with family. The weather in the bay area has been beautiful lately.
-          </p>
-        </div>
-        <div>
-          <div class="section-label">Study / academic</div>
-          <p class="test-block">
-            Looking for study partners for the math exam next week. Anyone want to join a coding study group?
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- BORDERLINE — Might WARN -->
-    <div class="card">
-      <div class="card-header warn">🟡 Borderline — Expect: WARNING (yellow outline)</div>
-      <div class="card-body">
-        <div>
-          <div class="section-label">Ambiguous delivery language</div>
-          <p class="test-block">
-            Fast delivery guaranteed to your doorstep. Discreet packaging available on request.
-          </p>
-        </div>
-        <div>
-          <div class="section-label">Vague product listing</div>
-          <p class="test-block">
-            Looking for a connect in the area. Need a reliable supplier with good product quality.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- NEWS CONTEXT — Should be SAFE (context matters) -->
-    <div class="card">
-      <div class="card-header safe">📰 News / Educational — Expect: SAFE</div>
-      <div class="card-body">
-        <div>
-          <div class="section-label">Journalism context</div>
-          <p class="test-block">
-            Police seized a large shipment of illegal substances at the border checkpoint. Three suspects were arrested.
-          </p>
-        </div>
-        <div>
-          <div class="section-label">Academic / research</div>
-          <p class="test-block">
-            The study analyzed social media platforms for patterns of drug-related activity using NLP techniques.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <!-- IMAGE SCAN TEST CARD -->
-    <div class="card" style="grid-column: span 2;">
-      <div class="card-header drug" style="background: rgba(147, 51, 234, 0.08); border-bottom: 1px solid rgba(147, 51, 234, 0.15); color: #c084fc;">
-        📸 Image Scan Testing
-      </div>
-      <div class="card-body" style="flex-direction: row; gap: 24px; flex-wrap: wrap; justify-content: space-around;">
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 1; min-width: 250px;">
-          <div class="section-label">Drug Image (Expect Blur / Block)</div>
-          <img src="drug_image.png" alt="Drug Advertisement Flyer" style="max-width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" />
-        </div>
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 1; min-width: 250px;">
-          <div class="section-label">Safe Image (Expect Touch/Outline)</div>
-          <img src="safe_image.png" alt="Safe Organic Tea Flyer" style="max-width: 100%; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" />
-        </div>
-      </div>
-    </div>
-
-    <!-- REAL DRUG IMAGES CARD -->
-    <div class="card" style="grid-column: span 2;">
-      <div class="card-header drug" style="background: rgba(239, 68, 68, 0.08); border-bottom: 1px solid rgba(239, 68, 68, 0.15); color: #f87171;">
-        📸 Real Drug Images from Folder
-      </div>
-      <div class="card-body" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 18px; padding: 18px;">
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-          <div class="section-label">Real Image 1</div>
-          <img src="drug%20image/download.jpeg" alt="Real Drug Content 1" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" />
-        </div>
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-          <div class="section-label">Real Image 2</div>
-          <img src="drug%20image/download%20(1).jpeg" alt="Real Drug Content 2" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" />
-        </div>
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-          <div class="section-label">Real Image 3</div>
-          <img src="drug%20image/download%20(2).jpeg" alt="Real Drug Content 3" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" />
-        </div>
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-          <div class="section-label">Real Image 4</div>
-          <img src="drug%20image/download%20(3).jpeg" alt="Real Drug Content 4" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" />
-        </div>
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-          <div class="section-label">Real Image 5</div>
-          <img src="drug%20image/download%20(4).jpeg" alt="Real Drug Content 5" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" />
-        </div>
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-          <div class="section-label">Real Image 6</div>
-          <img src="drug%20image/download%20(5).jpeg" alt="Real Drug Content 6" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" />
-        </div>
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-          <div class="section-label">Real Image 7</div>
-          <img src="drug%20image/download%20(6).jpeg" alt="Real Drug Content 7" style="width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" />
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Legend -->
-  <div class="legend">
-    <h3>What the Extension Does to Each Block</h3>
-    <div class="legend-grid">
-      <div class="legend-item">
-        <div class="legend-icon">🔴</div>
-        <div>
-          <div class="legend-title">Block (risk ≥ 70%)</div>
-          <div class="legend-desc">Text blurred + red banner. Click to reveal.</div>
-        </div>
-      </div>
-      <div class="legend-item">
-        <div class="legend-icon">🟡</div>
-        <div>
-          <div class="legend-title">Warn (risk 40–70%)</div>
-          <div class="legend-desc">Yellow outline + ⚠️ badge on text block.</div>
-        </div>
-      </div>
-      <div class="legend-item">
-        <div class="legend-icon">🟢</div>
-        <div>
-          <div class="legend-title">Safe (risk &lt; 40%)</div>
-          <div class="legend-desc">No change. Text displays normally.</div>
-        </div>
-      </div>
-    </div>
   </div>
 
 </body>
+
 </html>

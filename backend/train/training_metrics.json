@@ -1,0 +1,10 @@
+{
+  "distilbert": {
+    "accuracy": 1.0,
+    "f1_score": 1.0
+  },
+  "tfidf_lr": {
+    "accuracy": 1.0,
+    "f1_score": 1.0
+  }
+}

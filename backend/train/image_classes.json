@@ -1,0 +1,10 @@
+{
+  "classes": [
+    "drug",
+    "safe"
+  ],
+  "class_to_idx": {
+    "drug": 0,
+    "safe": 1
+  }
+}

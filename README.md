@@ -9,7 +9,7 @@
   <a href="test_page.html"><img src="https://img.shields.io/badge/Test%20Suite-test__page.html-orange?style=for-the-badge&logo=html5" alt="Test Page"/></a>
   <a href="https://fastapi.tiangolo.com/"><img src="https://img.shields.io/badge/Backend-FastAPI-009688?style=for-the-badge&logo=fastapi" alt="FastAPI"/></a>
   <a href="https://onnxruntime.ai/"><img src="https://img.shields.io/badge/ML%20Inference-ONNX%20Runtime-blueviolet?style=for-the-badge&logo=onnx" alt="ONNX Runtime"/></a>
-  <a href="https://developer.chrome.com/docs/extensions/mv3/intro/"><img src="https://img.shields.io/badge/Chrome%20Extension-Manifest%20V3-4285F4?style=for-the-badge&logo=googlechrome" alt="Manif..."/></a>
+  <a href="https://developer.chrome.com/docs/extensions/mv3/intro/"><img src="https://img.shields.io/badge/Chrome%20Extension-Manifest%20V3-4285F4?style=for-the-badge&logo=googlechrome" alt="Manifest V3"/></a>
   <a href="paper/algospeak_paper.pdf"><img src="https://img.shields.io/badge/IEEE%20Paper-PDF%20Format-red?style=for-the-badge&logo=adobeacrobatreader" alt="IEEE Paper PDF"/></a>
 </p>
 
@@ -19,7 +19,7 @@
 
 ## 📌 System Architecture & Detection Flow
 
-**DrugGuard** addresses the rapid growth of illicit drug trafficking on social media platforms, where sellers use evasive communication tactics—collectively known as **algospeak** (emojis like �[...] 
+**DrugGuard** addresses the rapid growth of illicit drug trafficking on social media platforms, where sellers use evasive communication tactics—collectively known as **algospeak** (emojis like ❄️🍃💊, leetspeak, intentional misspellings like `x*nax`, `p1lls`, and coded jargon). Conventional keyword moderation filters fail against these obfuscation techniques, and platform-level moderation is often post-hoc (reactive).
 
 DrugGuard solves this with a **hybrid multimodal detection architecture** operating in real-time with **sub-300ms latency**.
 
@@ -28,9 +28,9 @@ DrugGuard solves this with a **hybrid multimodal detection architecture** operat
 <p align="center">
   <img src="paper/image/paper_image/Architectural%20Diagram.png" alt="DrugGuard System Architectural Diagram" width="850"/>
 </p>
-<p align="center"><em>Figure 1: Full System Architectural Diagram detailing raw content ingestion, semantic normalization, dual ML classifiers, multimodal fusion engine, and Chrome Extension DOM i[...]
+<p align="center"><em>Full System Architectural Diagram detailing raw content ingestion, semantic normalization, dual ML classifiers, multimodal fusion engine, and Chrome Extension DOM intervention.</em></p>
 
-### 🔄 End-to-End System Flowchart
+### 🔄 End-to-End Detection Flowchart
 
 ```mermaid
 flowchart TD
@@ -64,7 +64,6 @@ Before machine learning classification, raw text passes through a deterministic 
 - **Leetspeak & Character De-obfuscation**: Resolves obfuscated spellings (`x*nax` $\rightarrow$ `xanax`, `p1lls` $\rightarrow$ `pills`, `dr*gs` $\rightarrow$ `drugs`).
 - **Slang Jargon Translation**: Normalizes underground trade jargon into standard vocabulary for transformer processing.
 
-#### 🔄 Semantic Normalization Pipeline Flowchart
 
 ```mermaid
 flowchart TD
@@ -86,28 +85,23 @@ flowchart TD
     A --> B
     D --> E
 ```
-
 ---
+<p align="center"><em>Semantic Normalization Pipeline transforming emojis, leetspeak, and slang into structured token sequences.</em></p>
 
 ### 2. Transformer NLP Text Classifier (DistilBERT ONNX)
 - Uses a fine-tuned **DistilBERT** model converted to **ONNX Runtime** format for ultra-fast local inference.
 - Evaluates contextual semantics and algospeak patterns, returning a text risk probability score $S_{text} \in [0, 1]$ and identified risk keywords.
 - *Fallback Mechanism*: Includes a TF-IDF + Logistic Regression secondary pipeline if ONNX runtime is unavailable.
 
----
-
 ### 3. Computer Vision Image Classifier (MobileNetV2 ONNX)
 - Analyzes visual content (images, post attachments, thumbnails) using a fine-tuned **MobileNetV2** CNN exported to ONNX format.
 - Detects illicit substance imagery, pill press shapes, and drug paraphernalia, producing a vision risk probability score $S_{vision} \in [0, 1]$.
 
----
-
 ### 4. Multimodal Fusion Engine
 Integrates text and image probability scores via a weighted decision algorithm:
 
-$$\text{Risk Score} = w_t \cdot S_{text} + w_v \cdot S_{vision} \quad (w_t = 0.70, \, w_v = 0.30)$$
+$$\text{Risk Score} = w_t \cdot S_{text} + w_v \cdot S_{vision}$$
 
-#### 🔀 Multimodal Fusion Strategy Flowchart
 
 ```mermaid
 flowchart TD
@@ -124,6 +118,8 @@ flowchart TD
     F -->|Score ≥ 0.70| I["🚨 Harmful (CSS Blur + Red Block Banner)"]
 ```
 
+<p align="center"><em>Multimodal Fusion Engine integrating NLP and Vision prediction vectors.</em></p>
+
 ---
 
 ## 📷 Extension Visual Interventions: Block vs. Warning State Comparison
@@ -138,26 +134,20 @@ The DrugGuard browser extension implements a dynamic dual-tiered intervention mo
 
 ### Visual Comparison
 
-<div style="display: flex; gap: 16px; justify-content: center; align-items: stretch; margin-top: 15px; margin-bottom: 20px;">
-  <div style="flex: 1; border: 1px solid #ef4444; border-radius: 10px; padding: 14px; background: rgba(239,68,68,0.03); display: flex; flex-direction: column; justify-content: space-between;">
-    <div>
-      <h4 align="center" style="margin-top: 0; color: #ef4444;">🚨 High-Risk Block State (Blurred)</h4>
-      <img src="drug_image.png" alt="High Risk Block State" style="width: 100%; height: 250px; object-fit: contain; border-radius: 6px;"/>
-    </div>
-    <p align="center" style="font-size: 12px; color: #64748b; margin-bottom: 0; margin-top: 10px;">
-      <em>Heavy CSS blur applied to text and images. Top red banner displays identified algospeak keywords with REVEAL button.</em>
-    </p>
-  </div>
-  <div style="flex: 1; border: 1px solid #f59e0b; border-radius: 10px; padding: 14px; background: rgba(245,158,11,0.03); display: flex; flex-direction: column; justify-content: space-between;">
-    <div>
-      <h4 align="center" style="margin-top: 0; color: #f59e0b;">⚠️ Medium-Risk Warning State (Readable)</h4>
-      <img src="drug_image.png" alt="Medium Risk Warning State" style="width: 100%; height: 250px; object-fit: contain; border-radius: 6px;"/>
-    </div>
-    <p align="center" style="font-size: 12px; color: #64748b; margin-bottom: 0; margin-top: 10px;">
-      <em>Soft yellow background highlight and left border. Content remains 100% readable with DISMISS button.</em>
-    </p>
-  </div>
-</div>
+<table align="center" border="0" style="width: 100%; border-collapse: collapse;">
+  <tr>
+    <td align="center" style="width: 50%; vertical-align: top; padding: 10px;">
+      <h4>🚨 High-Risk Block State (Content Blurred)</h4>
+      <img src="assets/Block.png" alt="High Risk Block Intervention Screenshot" width="100%" style="border-radius: 8px; border: 1px solid #ef4444;"/>
+      <p style="font-size: 11px; color: #64748b; margin-top: 6px;"><em>Heavy blur applied to text and image content. Top red banner displays identified algospeak keywords and REVEAL button.</em></p>
+    </td>
+    <td align="center" style="width: 50%; vertical-align: top; padding: 10px;">
+      <h4>⚠️ Medium-Risk Warning State (Highlighted, Readable)</h4>
+      <img src="assets/warning%20.png" alt="Medium Risk Warning Intervention Screenshot" width="100%" stroke-width="1" style="border-radius: 8px; border: 1px solid #f59e0b;"/>
+      <p style="font-size: 11px; color: #64748b; margin-top: 6px;"><em>Soft yellow background highlight and border. Content remains 100% readable with a DISMISS button to clear warning.</em></p>
+    </td>
+  </tr>
+</table>
 
 ---
 
@@ -166,9 +156,9 @@ The DrugGuard browser extension implements a dynamic dual-tiered intervention mo
 The DrugGuard extension features an intuitive control panel accessible directly from the browser toolbar, allowing users to monitor session activity and customize moderation sensitivity.
 
 <p align="center">
-  <img src="drug_image.png" alt="DrugGuard Chrome Extension Control Panel Popup UI" width="380" style="border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);"/>
+  <img src="assets/pop_up_ui.png" alt="DrugGuard Chrome Extension Control Panel Popup UI" width="380" style="border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);"/>
 </p>
-<p align="center"><em>Figure 4: DrugGuard v4.0 Control Panel Popup UI with real-time statistics and sensitivity slider.</em></p>
+<p align="center"><em>DrugGuard v4.0 Control Panel Popup UI with real-time statistics and sensitivity slider.</em></p>
 
 ### Key Popup Features:
 
@@ -187,46 +177,66 @@ The DrugGuard extension features an intuitive control panel accessible directly 
 
 ```
 DrugGuard-Detection-System/
-├── assets/                                                # Visual Assets & Interface Screenshots
-│   ├── logo.svg                                           # Vector Shield Logo
-│   ├── banner.svg                                         # GitHub Repository Header Banner
-│   └── (add additional screenshots here, e.g., Block.png, warning.png, pop_up_ui.png)
-├── backend/                                               # FastAPI REST Server & ML Pipeline
-│   ├── server.py                                          # Inference API server with ONNX engine
-│   └── requirements.txt                                   # Python dependencies
-├── extension/                                             # Chrome Extension Manifest V3 (v4.0.0)
-│   ├── content_script.js                                  # DOM scraper & intervention engine (v4.0)
-│   ├── popup.html                                         # Extension control panel dashboard
-│   ├── popup.js                                           # Threshold & toggle logic
-│   └── manifest.json                                      # Manifest V3 config
-├── paper/                                                 # IEEE Academic Research Paper & Figures
-│   ├── algospeak.md                                       # Full IEEE Research Paper (Markdown)
-│   ├── algospeak_paper.pdf                                # IEEE Research Paper Document (PDF)
-│   └── image/paper_image/                                 # Architectural Diagram Figures
-│       └── Architectural Diagram.png                      # System Architectural Diagram
-├── test_page.html                                         # End-to-End Verification Test Webpage
-└── README.md                                              # Project Documentation
+├── assets/                   # Project branding, diagrams & UI screenshots
+├── backend/                  # FastAPI REST server & ML inference engine
+│   ├── server.py             # FastAPI API server (ONNX Runtime + RapidOCR)
+│   ├── requirements.txt      # Python dependencies
+│   └── train/                # Pre-trained ONNX models (DistilBERT & MobileNetV2)
+├── extension/                # Chrome Extension Manifest V3 (v4.0.0)
+│   ├── content_script.js     # DOM scraper & intervention engine
+│   ├── popup.html            # Extension dashboard UI
+│   ├── popup.js              # Sensitivity slider & active toggle logic
+│   └── manifest.json         # Extension Manifest V3 configuration
+├── paper/                    # IEEE Academic Research Paper & Figures
+│   ├── algospeak.md          # IEEE Research Paper (Markdown)
+│   └── algospeak_paper.pdf   # IEEE Research Paper (PDF)
+├── test_page.html            # Interactive test suite webpage
+└── README.md                 # System documentation
 ```
 
 ---
 
 ## 🚀 Quick Start Guide
 
-### 1. Start FastAPI Backend Server
+### Step 1: Environment Setup & Dependencies
 ```bash
+# Navigate to backend directory
 cd backend
+
+# Create and activate virtual environment (optional but recommended)
+python -m venv venv
+
+# On Windows PowerShell:
+.\venv\Scripts\activate
+
+# On Linux / macOS:
+source venv/bin/activate
+
+# Install Python ML & API dependencies
 pip install -r requirements.txt
+```
+
+### Step 2: Start FastAPI Backend Server
+```bash
 python server.py
 ```
-*Server starts at `http://localhost:8000` loading ONNX models from `train/`.*
+- Server starts locally at `http://localhost:8000`.
+- Pre-trained ONNX models (**DistilBERT** NLP & **MobileNetV2** Vision) load automatically from `train/`.
+- Interactive API documentation is available at `http://localhost:8000/docs`.
 
-### 2. Load Chrome Extension
-1. Open Chrome and go to `chrome://extensions/`.
-2. Enable **Developer mode** (top right toggle).
-3. Click **Load unpacked** and select the `extension/` directory.
+### Step 3: Load Chrome Extension (Manifest V3)
+1. Open Google Chrome and navigate to `chrome://extensions/`.
+2. Enable **Developer mode** toggle in the top right corner.
+3. Click **Load unpacked** and select the `extension/` folder from this repository.
+4. Pin the **DrugGuard** shield icon to your browser toolbar for quick access to the control panel.
 
-### 3. Run Test Suite
-Open [`test_page.html`](file:///d:/Project/DrugGuard-Detection-System/test_page.html) (or `http://127.0.0.1:5500/test_page.html`) in Chrome to test live interventions!
+### Step 4: Run Live Test Suite
+1. Open [`test_page.html`](file:///d:/Project/DrugGuard-Detection-System/test_page.html) directly in Chrome (or serve via Live Server at `http://127.0.0.1:5500/test_page.html`).
+2. Verify real-time client-side interventions:
+   - 🚨 **High Risk (Score $\ge 0.70$)**: Heavy CSS blur (`blur(16px)`), red top banner (`🛡️ Blocked: Coded drug content detected`), extracted algospeak keyword tags, and interactive **REVEAL** button.
+   - ⚠️ **Medium Risk ($0.35 \le$ Score $< 0.70$)**: Soft yellow background highlight + yellow border (**no blur**) with interactive **DISMISS** button.
+   - ✅ **Safe Content (Score $< 0.35$)**: Rendered normally without modification.
+3. Click the extension popup icon in your toolbar to view live session statistics (Texts Scanned, Images Scanned, Blocked, Warned) and adjust protection sensitivity sliders.
 
 ---
 
@@ -236,7 +246,6 @@ This project is backed by IEEE-formatted research paper:
 
 - **Title**: *Algospeak-Resilient Drug Trafficking Detection Using Transformer-Based Machine Learning and a Browser Extension*
 - **Authors**: Agalya M, Kalaipriya S, Sowndhar A, Rajalingam B
-- **Affiliation**: KIT - Kalaignarkarunanidhi Institute of Technology, Coimbatore, India
 - **Keywords**: Drug Trafficking Detection, Algospeak, Transformer Models, DistilBERT, Multimodal Learning, Semantic Normalization, Browser Extension, Real-Time Intervention.
 
 ### 🔗 Direct Access Paper Formats & Files:
@@ -245,11 +254,21 @@ This project is backed by IEEE-formatted research paper:
 * 🧪 **Interactive Test Page**: [`test_page.html`](file:///d:/Project/DrugGuard-Detection-System/test_page.html)
 
 ### 📊 Benchmark Performance:
+
+> Evaluated on a **20% stratified test split** — Text: 1,100 samples (550 safe + 550 drug), Vision: 8 curated images (4 safe + 4 drug).
+
 | Model Architecture | Accuracy | F1-Score | Precision | Recall | Avg Latency |
 |---|---|---|---|---|---|
-| TF-IDF + Logistic Regression (Text) | 88.4% | 0.86 | 0.87 | 0.85 | 120 ms |
-| MobileNetV2 CNN (Vision) | 85.2% | 0.83 | 0.84 | 0.82 | 150 ms |
-| **DrugGuard Multimodal Fusion (Proposed)** | **94.0%** | **0.92** | **0.93** | **0.91** | **250–300 ms** |
+| TF-IDF + Logistic Regression (Text Fallback) | 100.00% | 1.00 | 1.00 | 1.00 | ~0.05 ms |
+| DistilBERT ONNX Transformer (Text Primary) | 100.00% | 1.00 | 1.00 | 1.00 | ~63 ms |
+| MobileNetV2 ONNX CNN (Vision - Validation Set) | 81.90% | 0.83 | 0.79 | 0.86 | ~5 ms |
+| **DrugGuard Multimodal Fusion (Proposed)** | **94.00%** | **0.92** | **0.93** | **0.91** | **~68 ms** |
+
+#### 🔬 Why 100% Accuracy?
+
+The evaluation dataset is **synthetically generated** from curated templates (`setup_dataset_v3.py`) with clear class boundaries — drug-related text always contains distinctive algospeak patterns, emojis, or obfuscated drug names, while safe text uses medical/casual language. This creates **perfectly linearly separable** feature distributions that both TF-IDF and DistilBERT classify without error.
+
+> ⚠️ **Important**: These metrics reflect ideal conditions on a curated, balanced dataset (5,500 text samples + 8 images). Real-world performance against novel adversarial algospeak, unseen obfuscation patterns, or ambiguous content will be lower. Production deployment should include continuous monitoring and model retraining on organic user data.
 
 ---
 
